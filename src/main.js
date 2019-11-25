@@ -2,17 +2,16 @@
 
 const EVENTS_COUNT = 3;
 
-const createMenuTemplate = () => {
-  return (
+const createMenuTemplate = () =>
+  (
     `<nav class="trip-controls__trip-tabs  trip-tabs">
       <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
       <a class="trip-tabs__btn" href="#">Stats</a>
-  </nav>`
+    </nav>`
   );
-};
 
-const createFiltersTemplate = () => {
-  return (
+const createFiltersTemplate = () =>
+  (
     `<form class="trip-filters" action="#" method="get">
     <div class="trip-filters__filter">
       <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
@@ -30,22 +29,20 @@ const createFiltersTemplate = () => {
     </div>
 
     <button class="visually-hidden" type="submit">Accept filter</button>
-  </form>`
+    </form>`
   );
-};
 
-const createTripInfoTemplate = () => {
-  return (
+const createTripInfoTemplate = () =>
+  (
     `<div class="trip-info__main">
       <h1 class="trip-info__title">Amsterdam &mdash; ... &mdash; Amsterdam</h1>
 
       <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;21</p>
     </div>`
   );
-};
 
-const createAddEventFormTemplate = () => {
-  return (
+const createAddEventFormTemplate = () =>
+  (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
@@ -154,16 +151,11 @@ const createAddEventFormTemplate = () => {
     </header>
   </form>`
   );
-};
 
-const createDayListTemplate = () => {
-  return (
-    `<ul class="trip-days"></ul>`
-  );
-};
+const createDayListTemplate = () => `<ul class="trip-days"></ul>`;
 
-const createDayTemplate = () => {
-  return (
+const createDayTemplate = () =>
+  (
     `<li class="trip-days__item  day">
       <div class="day__info">
         <span class="day__counter">1</span>
@@ -172,49 +164,54 @@ const createDayTemplate = () => {
       <ul class="trip-events__list"></ul>
     </li>`
   );
-};
 
-const createEventTemplate = () => {
-  return (
+const createEventTemplate = () =>
+  (
     `<li class="trip-events__item">
-    <div class="event">
-      <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
-      </div>
-      <h3 class="event__title">Taxi to airport</h3>
+      <div class="event">
+        <div class="event__type">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/taxi.png" alt="Event type icon">
+        </div>
+        <h3 class="event__title">Taxi to airport</h3>
 
-      <div class="event__schedule">
-        <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
-          &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+        <div class="event__schedule">
+          <p class="event__time">
+            <time class="event__start-time" datetime="2019-03-18T10:30">10:30</time>
+            &mdash;
+            <time class="event__end-time" datetime="2019-03-18T11:00">11:00</time>
+          </p>
+          <p class="event__duration">1H 30M</p>
+        </div>
+
+        <p class="event__price">
+          &euro;&nbsp;<span class="event__price-value">20</span>
         </p>
-        <p class="event__duration">1H 30M</p>
+
+        <h4 class="visually-hidden">Offers:</h4>
+        <ul class="event__selected-offers">
+          <li class="event__offer">
+            <span class="event__offer-title">Order Uber</span>
+            &plus;
+            &euro;&nbsp;<span class="event__offer-price">20</span>
+            </li>
+        </ul>
+
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>
       </div>
-
-      <p class="event__price">
-        &euro;&nbsp;<span class="event__price-value">20</span>
-      </p>
-
-      <h4 class="visually-hidden">Offers:</h4>
-      <ul class="event__selected-offers">
-        <li class="event__offer">
-          <span class="event__offer-title">Order Uber</span>
-          &plus;
-          &euro;&nbsp;<span class="event__offer-price">20</span>
-         </li>
-      </ul>
-
-      <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">Open event</span>
-      </button>
-    </div>
-  </li>`
+    </li>`
   );
-};
+
 
 const render = (container, template, position = `beforeend`) => {
   container.insertAdjacentHTML(position, template);
+};
+
+const renderEvents = (container, count) => {
+  for (let i = 0; i < count; i++) {
+    render(container, createEventTemplate());
+  }
 };
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
@@ -236,7 +233,4 @@ const dayList = eventsContainer.querySelector(`.trip-days`);
 render(dayList, createDayTemplate());
 
 const eventsList = dayList.querySelector(`.trip-events__list`);
-
-for (let i = 0; i < EVENTS_COUNT; i++) {
-  render(eventsList, createEventTemplate());
-}
+renderEvents(eventsList, EVENTS_COUNT);
