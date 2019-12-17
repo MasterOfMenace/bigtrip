@@ -1,5 +1,5 @@
 const getBoolean = () => {
-  return Math.random() > 0.5 ? true : false;
+  return Math.random() > 0.5;
 };
 const getRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;

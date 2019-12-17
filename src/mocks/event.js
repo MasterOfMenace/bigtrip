@@ -1,7 +1,7 @@
 import {getBoolean, getRandomValue, getRandomNumber} from '../utils.js';
-import {Offers} from '../constants.js';
+import {Offers, EventTypes} from '../constants.js';
 
-const EventTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
+const MILLISECONDSONDAY = 86400000;
 
 const Cities = [`Amsterdam`, `Moscow`, `London`, `Bangkok`, `Vladivostok`, `Los Angeles`, `San Francisco`, `New York`, `New Vasuki`];
 
@@ -28,11 +28,25 @@ const generateShowplaces = () => {
 };
 
 const createStartDate = () => {
-  const millisecondsOnDay = 86400000;
+
   const date = Date.now();
   const sign = getBoolean() ? 1 : -1;
-  const diff = sign * getRandomNumber(0, 7 * millisecondsOnDay);
+  const diff = sign * getRandomNumber(0, 7 * MILLISECONDSONDAY);
   return date + diff;
+};
+
+const createEventType = (types) => {
+  const group = getRandomValue(Object.keys(types));
+  const eventType = getRandomValue(types[group]);
+  // console.log(typeof group);
+  // console.log(typeof eventType);
+  // console.log(eventType);
+
+  return {
+    // group,
+    type: eventType.type,
+    description: eventType.description,
+  };
 };
 
 
@@ -40,7 +54,8 @@ const createEvent = () => {
   const dates = Array(2).fill(``).map(createStartDate).sort((a, b) => a - b);
 
   return {
-    type: getRandomValue(EventTypes),
+    // type: getRandomValue(EventTypes),
+    type: createEventType(EventTypes),
     city: getRandomValue(Cities),
     offers: new Set(generateOffers(Offers)),
     description: createDescription(DescriptionItems),

@@ -16,6 +16,10 @@ const render = (container, template, position = `beforeend`) => {
   container.insertAdjacentHTML(position, template);
 };
 
+const createEvents = (array, createTemplate) => {
+  return `${array.map((elem) => createTemplate(elem)).join(`\n`)}`;
+};
+
 const renderEvents = (container, events) => {
   const dates = new Set();
   events.forEach((event) => {
@@ -24,25 +28,19 @@ const renderEvents = (container, events) => {
     dates.add(eventDateFormatted);
   });
 
-  const createEvents = (array, createTemplate) => {
-    return `${array.map((elem) => createTemplate(elem)).join(`\n`)}`;
-  };
 
   Array.from(dates).forEach((date, index) => {
     const event = events.filter((ev) => {
       const eventDate = new Date(ev.startDate);
       const eventDateFormatted = `${eventDate.getFullYear()}/${eventDate.getMonth()}/${eventDate.getDate()}`;
-      if (eventDateFormatted === date) {
-        return ev;
-      } else {
-        return null;
-      }
+      return eventDateFormatted === date;
     });
 
     const eventTemplate = createEvents(event, createEventTemplate);
     const day = createDayTemplate(index + 1, date, eventTemplate);
     render(container, day);
   });
+  render(document.querySelector(`.trip-events__item`), createAddEventFormTemplate(events[0]), `afterbegin`);
 };
 
 const events = generateEvents(EVENTS_COUNT).sort((a, b) => a.startDate - b.startDate);
@@ -61,6 +59,5 @@ render(tripFiltersTitle, createFiltersTemplate(filters), `afterend`);
 const eventsContainer = document.querySelector(`.trip-events`);
 render(eventsContainer, createDayListTemplate());
 const dayList = eventsContainer.querySelector(`.trip-days`);
-render(dayList, createAddEventFormTemplate(events[0])); // сюда отрендерить первый элемент из ивентов
 
-renderEvents(dayList, events.slice(1));
+renderEvents(dayList, events);

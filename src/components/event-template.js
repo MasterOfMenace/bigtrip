@@ -8,13 +8,15 @@ const getDuration = (timestamp) => {
   return `${formatTime(days)} ${formatTime(hours)} ${formatTime(minutes)}`;
 };
 
-const createEventTypeMarkup = (type, destination) => {
-  const url = `img/icons/${type.toLowerCase()}.png`;
+const createEventTypeMarkup = (eventType, destination) => {
+  const {type, description} = eventType;
+  const url = `img/icons/${type}.png`;
+
   return (
     `<div class="event__type">
       <img class="event__type-icon" width="42" height="42" src=${url} alt="Event type icon">
     </div>
-    <h3 class="event__title">${type} to ${destination}</h3>`
+    <h3 class="event__title">${description} ${destination}</h3>`
   );
 };
 

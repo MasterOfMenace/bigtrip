@@ -1,16 +1,57 @@
-const MonthNames = {
-  0: `JAN`,
-  1: `FEB`,
-  2: `MAR`,
-  3: `APR`,
-  4: `MAY`,
-  5: `JUN`,
-  6: `JUL`,
-  7: `AUG`,
-  8: `SEP`,
-  9: `OCT`,
-  10: `NOW`,
-  11: `DEC`,
+const MonthNames = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOW`, `DEC`];
+
+// const EventTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
+
+const EventTypes = {
+  transportGroup: [
+    {
+      type: `taxi`,
+      description: `Taxi to`
+    },
+    {
+      type: `bus`,
+      description: `Bus to`
+    },
+    {
+      type: `train`,
+      description: `Train to`
+    },
+    {
+      type: `ship`,
+      description: `Ship to`
+    },
+    {
+      type: `transport`,
+      description: `Transport to`
+    },
+    {
+      type: `flight`,
+      description: `Flight to`
+    },
+    {
+      type: `drive`,
+      description: `Drive to`
+    },
+  ],
+  activityGroup: [
+    {
+      type: `check-in`,
+      description: `Check-in into a hotel at`
+    },
+    {
+      type: `sightseeing`,
+      description: `Sightseeing at`
+    },
+    {
+      type: `restaurant`,
+      description: `Restaurant at`
+    },
+  ]
+};
+
+const EventTypesGroups = {
+  transportGroup: `Transfer`,
+  activityGroup: `Activity`,
 };
 
 const Offers = [
@@ -36,4 +77,4 @@ const Offers = [
   },
 ];
 
-export {MonthNames, Offers};
+export {MonthNames, Offers, EventTypes, EventTypesGroups};
