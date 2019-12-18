@@ -127,9 +127,7 @@ const createAddEventFormTemplate = (event) => {
   const typeMarkup = createEventTypeMarkup(type);
   const destinationMarkup = createEventDestinationMarkup(type, city);
   const timesMarkup = createEventTimesMarkup(startDate, endDate);
-  const checkedOffers = Array.from(offers).map((offer) => {
-    return offer.type;
-  });
+  const checkedOffers = Array.from(offers).map((offer) => offer.type);
   const offersMarkup = Offers.map((offer) => createOfferMarkup(offer, checkedOffers)).join(`\n`);
   const descriptionMarkup = createDescriptionMarkup(description, showplaces);
   return (

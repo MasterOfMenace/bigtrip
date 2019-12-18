@@ -38,12 +38,8 @@ const createStartDate = () => {
 const createEventType = (types) => {
   const group = getRandomValue(Object.keys(types));
   const eventType = getRandomValue(types[group]);
-  // console.log(typeof group);
-  // console.log(typeof eventType);
-  // console.log(eventType);
 
   return {
-    // group,
     type: eventType.type,
     description: eventType.description,
   };
@@ -54,7 +50,6 @@ const createEvent = () => {
   const dates = Array(2).fill(``).map(createStartDate).sort((a, b) => a - b);
 
   return {
-    // type: getRandomValue(EventTypes),
     type: createEventType(EventTypes),
     city: getRandomValue(Cities),
     offers: new Set(generateOffers(Offers)),
