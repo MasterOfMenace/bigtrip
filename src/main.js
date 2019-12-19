@@ -11,7 +11,7 @@ import EventEditFormComponent from './components/addform.js';
 import {generateEvents} from './mocks/event.js';
 import {generateFilters} from './mocks/filters.js';
 
-const EVENTS_COUNT = 3;
+const EVENTS_COUNT = 5;
 
 const renderEvents = (container, events) => {
   const dates = new Set();
@@ -32,11 +32,25 @@ const renderEvents = (container, events) => {
     const day = new DayComponent(index + 1, date).getElement();
     const eventsList = day.querySelector(`.trip-events__list`);
     eventsOnDay.map((event) => {
-      renderElement(eventsList, new EventComponent(event).getElement(), RenderPosition.BEFOREEND);
+      const eventComponent = new EventComponent(event);
+      const editEventComponent = new EventEditFormComponent(event);
+
+      const openButton = eventComponent.getElement().querySelector(`.event__rollup-btn`);
+
+      openButton.addEventListener(`click`, () => {
+        eventsList.replaceChild(editEventComponent.getElement(), eventComponent.getElement());
+      });
+
+      const eventEditForm = editEventComponent.getElement().querySelector(`form`);
+
+      eventEditForm.addEventListener(`submit`, () => {
+        eventsList.replaceChild(eventComponent.getElement(), editEventComponent.getElement());
+      });
+
+      renderElement(eventsList, eventComponent.getElement(), RenderPosition.BEFOREEND);
     });
     renderElement(container, day, RenderPosition.BEFOREEND);
   });
-  renderElement(document.querySelector(`.trip-events__item`), new EventEditFormComponent(events[0]).getElement(), RenderPosition.AFTERBEGIN);
 };
 
 const events = generateEvents(EVENTS_COUNT).sort((a, b) => a.startDate - b.startDate);
@@ -51,9 +65,6 @@ const filtersComponent = new FiltersComponent(filters);
 renderElement(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
 
 const tripControls = document.querySelector(`.trip-controls`);
-// const tripMenuTitle = tripControls.firstElementChild;
-// const tripFiltersTitle = tripControls.lastElementChild;
-// render(tripMenuTitle, createMenuTemplate(), `afterend`);
 renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGIN); // подумать как засунуть под h2
 renderElement(tripControls, filtersComponent.getElement(), RenderPosition.BEFOREEND);
 

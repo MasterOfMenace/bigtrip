@@ -131,7 +131,8 @@ const createAddEventFormTemplate = (event) => {
   const offersMarkup = Offers.map((offer) => createOfferMarkup(offer, checkedOffers)).join(`\n`);
   const descriptionMarkup = createDescriptionMarkup(description, showplaces);
   return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+    `<div>
+    <form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       ${typeMarkup}
       <div class="event__field-group  event__field-group--destination">
@@ -177,11 +178,10 @@ const createAddEventFormTemplate = (event) => {
 
       ${descriptionMarkup}
     </section>
-  </form>`
+  </form>
+  </div>`
   );
 };
-
-// export {createAddEventFormTemplate};
 
 export default class EventEditFormComponent {
   constructor(event) {
