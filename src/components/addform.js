@@ -1,5 +1,5 @@
 import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
-import {formatTime} from '../utils.js';
+import {formatTime, createElement} from '../utils.js';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;
@@ -181,4 +181,27 @@ const createAddEventFormTemplate = (event) => {
   );
 };
 
-export {createAddEventFormTemplate};
+// export {createAddEventFormTemplate};
+
+export default class EventEditFormComponent {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createAddEventFormTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
