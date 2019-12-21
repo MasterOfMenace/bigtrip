@@ -1,5 +1,5 @@
 import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
-import {formatTime} from '../utils.js';
+import {formatTime} from '../utils/utils';
 import AbstractComponent from './abstract-component.js';
 
 const createTypeMarkup = (eventType) => {
@@ -192,5 +192,11 @@ export default class EventEditFormComponent extends AbstractComponent {
 
   getTemplate() {
     return createAddEventFormTemplate(this._event);
+  }
+
+  setFormSubmitHandler(handler) {
+    const form = this.getElement().querySelector(`form`);
+
+    form.addEventListener(`submit`, handler);
   }
 }

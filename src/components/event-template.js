@@ -1,4 +1,4 @@
-import {formatTime} from '../utils.js';
+import {formatTime} from '../utils/utils';
 import AbstractComponent from './abstract-component.js';
 
 const getDuration = (timestamp) => {
@@ -77,5 +77,11 @@ export default class EventComponent extends AbstractComponent {
 
   getTemplate() {
     return createEventTemplate(this._event);
+  }
+
+  setRollupBtnClickHandler(handler) {
+    const rollupBtn = this.getElement().querySelector(`.event__rollup-btn`);
+
+    rollupBtn.addEventListener(`click`, handler);
   }
 }

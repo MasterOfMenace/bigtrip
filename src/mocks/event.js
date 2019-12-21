@@ -1,4 +1,4 @@
-import {getBoolean, getRandomValue, getRandomNumber} from '../utils.js';
+import {getBoolean, getRandomValue, getRandomNumber} from '../utils/utils';
 import {Offers, EventTypes} from '../constants.js';
 
 const MILLISECONDSONDAY = 86400000;
