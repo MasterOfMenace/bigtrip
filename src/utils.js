@@ -13,4 +13,26 @@ const formatTime = (time) => {
   return time < 10 && time !== 0 ? `0${time}` : time;
 };
 
-export {getBoolean, getRandomNumber, getRandomValue, formatTime};
+const createElement = (template) => {
+  const element = document.createElement(`div`);
+  element.innerHTML = template;
+
+  return element.firstChild;
+};
+
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
+
+const renderElement = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+  }
+};
+
+export {getBoolean, getRandomNumber, getRandomValue, formatTime, createElement, renderElement, RenderPosition};

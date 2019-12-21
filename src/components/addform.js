@@ -1,5 +1,5 @@
 import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
-import {formatTime} from '../utils.js';
+import {formatTime, createElement} from '../utils.js';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;
@@ -131,7 +131,8 @@ const createAddEventFormTemplate = (event) => {
   const offersMarkup = Offers.map((offer) => createOfferMarkup(offer, checkedOffers)).join(`\n`);
   const descriptionMarkup = createDescriptionMarkup(description, showplaces);
   return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+    `<div>
+    <form class="trip-events__item  event  event--edit" action="#" method="post">
     <header class="event__header">
       ${typeMarkup}
       <div class="event__field-group  event__field-group--destination">
@@ -177,8 +178,30 @@ const createAddEventFormTemplate = (event) => {
 
       ${descriptionMarkup}
     </section>
-  </form>`
+  </form>
+  </div>`
   );
 };
 
-export {createAddEventFormTemplate};
+export default class EventEditFormComponent {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createAddEventFormTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
