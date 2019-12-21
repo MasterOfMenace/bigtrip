@@ -1,8 +1,7 @@
 import {MonthNames} from '../constants.js';
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const createDayTemplate = (count, date) => {
-  // console.log(typeof events);
   date = new Date(date);
   const month = MonthNames[date.getMonth() + 1];
   const day = date.getDate();
@@ -17,29 +16,14 @@ const createDayTemplate = (count, date) => {
   );
 };
 
-// export {createDayTemplate};
-
-export default class DayComponent {
+export default class DayComponent extends AbstractComponent {
   constructor(count, date) {
+    super();
     this._count = count;
     this._date = date;
-    // this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createDayTemplate(this._count, this._date);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

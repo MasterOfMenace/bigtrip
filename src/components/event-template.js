@@ -1,4 +1,5 @@
-import {formatTime, createElement} from '../utils.js';
+import {formatTime} from '../utils/utils';
+import AbstractComponent from './abstract-component.js';
 
 const getDuration = (timestamp) => {
   const duration = new Date(timestamp);
@@ -68,27 +69,19 @@ const createEventTemplate = (event) => {
   );
 };
 
-// export {createEventTemplate};
-
-export default class EventComponent {
+export default class EventComponent extends AbstractComponent {
   constructor(event) {
+    super();
     this._event = event;
-    this._element = null;
   }
 
   getTemplate() {
     return createEventTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  setRollupBtnClickHandler(handler) {
+    const rollupBtn = this.getElement().querySelector(`.event__rollup-btn`);
 
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    rollupBtn.addEventListener(`click`, handler);
   }
 }

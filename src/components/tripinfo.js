@@ -1,5 +1,5 @@
 import {MonthNames} from '../constants.js';
-import {createElement} from '../utils.js';
+import AbstractComponent from './abstract-component.js';
 
 const getCities = (events) => {
   const cities = events.map((event) => event.city);
@@ -40,27 +40,13 @@ const createTripInfoTemplate = (events) => {
   );
 };
 
-// export {createTripInfoTemplate};
-
-export default class TripInfoComponent {
+export default class TripInfoComponent extends AbstractComponent {
   constructor(events) {
+    super();
     this._events = events;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._events);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
