@@ -3,7 +3,7 @@ import AbstractComponent from './abstract-component.js';
 
 const createDayTemplate = (count, date) => {
   date = new Date(date);
-  const month = MonthNames[date.getMonth() + 1];
+  const month = MonthNames[date.getMonth()];
   const day = date.getDate();
   return (
     `<li class="trip-days__item  day">
