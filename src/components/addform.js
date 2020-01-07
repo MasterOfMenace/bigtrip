@@ -126,7 +126,6 @@ const createDescriptionMarkup = (description, showplaces) => {
 const createAddEventFormTemplate = (event, options = {}) => {
   const {startDate, endDate, price, offers, isFavorite} = event;
   const {type, description, city, showplaces} = options;
-  // console.log(type, city);
   const typeMarkup = createEventTypeMarkup(EventTypes, type);
   const destinationMarkup = createEventDestinationMarkup(type, city);
   const timesMarkup = createEventTimesMarkup(startDate, endDate);
@@ -201,6 +200,32 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this.recoveryListeners();
   }
 
+  _setEventTypeChangeHandler() {
+    const eventTypeGroups = this.getElement().querySelectorAll(`.event__type-group`);
+    eventTypeGroups.forEach((group) => group.addEventListener(`change`, (evt) => {
+      this._type.type = evt.target.value;
+      const allTypes = Object.keys(EventTypes).map((it) => EventTypes[it]).reduce((a, b) => a.concat(b));
+      allTypes.filter((it) => {
+        if (it.type === event.target.value) {
+          this._type.description = it.description;
+        }
+      });
+      this.rerender();
+    }));
+  }
+
+  _setCityInputChangeHandler() {
+    const cityInput = this.getElement().querySelector(`.event__input--destination`);
+    cityInput.addEventListener(`change`, (evt) => {
+      if (evt.target.value !== this._city) {
+        this._city = evt.target.value;
+        this._description = createDescription(DescriptionItems);
+        this._showplaces = generateShowplaces();
+        this.rerender();
+      }
+    });
+  }
+
   getTemplate() {
     return createAddEventFormTemplate(this._event, {
       type: this._type,
@@ -224,29 +249,9 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
   recoveryListeners() {
     this.setFormSubmitHandler(this._formSubmitHandler);
     this.setFavoriteButtonClickHandler(this._favoriteBtnClickHandler);
-    const element = this.getElement();
 
-    const eventTypeGroups = element.querySelectorAll(`.event__type-group`);
-    eventTypeGroups.forEach((group) => group.addEventListener(`change`, (evt) => {
-      this._type.type = evt.target.value;
-      const allTypes = Object.keys(EventTypes).map((it) => EventTypes[it]).reduce((a, b) => a.concat(b));
-      allTypes.filter((it) => {
-        if (it.type === event.target.value) {
-          this._type.description = it.description;
-        }
-      });
-      this.rerender();
-    }));
-
-    const cityInput = element.querySelector(`.event__input--destination`);
-    cityInput.addEventListener(`change`, (evt) => {
-      if (evt.target.value !== this._city) {
-        this._city = evt.target.value;
-        this._description = createDescription(DescriptionItems);
-        this._showplaces = generateShowplaces();
-        this.rerender();
-      }
-    });
+    this._setEventTypeChangeHandler();
+    this._setCityInputChangeHandler();
   }
 
   reset() {
