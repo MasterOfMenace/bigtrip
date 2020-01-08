@@ -59,6 +59,7 @@ const createEvent = () => {
     endDate: dates[1],
     duration: dates[1] - dates[0],
     price: getRandomNumber(0, 1000),
+    isFavorite: getBoolean(),
   };
 };
 
@@ -66,4 +67,4 @@ const generateEvents = (count) => {
   return new Array(count).fill(``).map(createEvent);
 };
 
-export {generateEvents};
+export {generateEvents, createDescription, DescriptionItems, generateShowplaces};

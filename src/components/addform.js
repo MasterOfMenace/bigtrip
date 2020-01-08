@@ -1,6 +1,7 @@
+import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/event';
 import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
 import {formatTime} from '../utils/utils';
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;
@@ -28,11 +29,10 @@ const createTypeRadioMarkup = (eventType, checked) => {
   );
 };
 
-const createEventTypeMarkup = (type) => {
-  const evtType = createTypeMarkup(type);
-  const checkedType = type.type;
-  const typesList = Object.keys(EventTypes);
-  const evtTypesMarkup = typesList.map((it) => createGroups(EventTypes[it], checkedType, EventTypesGroups[it])).join(`\n`);
+const createEventTypeMarkup = (types, currentType) => {
+  const evtType = createTypeMarkup(currentType);
+  const typesList = Object.keys(types);
+  const evtTypesMarkup = typesList.map((it) => createGroups(types[it], currentType.type, EventTypesGroups[it])).join(`\n`);
 
   return (
     `<div class="event__type-wrapper">
@@ -123,9 +123,10 @@ const createDescriptionMarkup = (description, showplaces) => {
   );
 };
 
-const createAddEventFormTemplate = (event) => {
-  const {type, city, startDate, endDate, price, offers, description, showplaces} = event;
-  const typeMarkup = createEventTypeMarkup(type);
+const createAddEventFormTemplate = (event, options = {}) => {
+  const {startDate, endDate, price, offers, isFavorite} = event;
+  const {type, description, city, showplaces} = options;
+  const typeMarkup = createEventTypeMarkup(EventTypes, type);
   const destinationMarkup = createEventDestinationMarkup(type, city);
   const timesMarkup = createEventTimesMarkup(startDate, endDate);
   const checkedOffers = Array.from(offers).map((offer) => offer.type);
@@ -154,7 +155,7 @@ const createAddEventFormTemplate = (event) => {
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
       <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -184,19 +185,86 @@ const createAddEventFormTemplate = (event) => {
   );
 };
 
-export default class EventEditFormComponent extends AbstractComponent {
+export default class EventEditFormComponent extends AbstractSmartComponent {
   constructor(event) {
     super();
     this._event = event;
+
+    this._type = Object.assign({}, event.type);
+    this._city = event.city;
+    this._description = event.description.slice();
+    this._showplaces = event.showplaces.slice();
+
+    this._formSubmitHandler = null;
+    this._favoriteBtnClickHandler = null;
+    this.recoveryListeners();
+  }
+
+  _setEventTypeChangeHandler() {
+    const eventTypeGroups = this.getElement().querySelectorAll(`.event__type-group`);
+    eventTypeGroups.forEach((group) => group.addEventListener(`change`, (evt) => {
+      this._type.type = evt.target.value;
+      const allTypes = Object.keys(EventTypes).map((it) => EventTypes[it]).reduce((a, b) => a.concat(b));
+      allTypes.filter((it) => {
+        if (it.type === event.target.value) {
+          this._type.description = it.description;
+        }
+      });
+      this.rerender();
+    }));
+  }
+
+  _setCityInputChangeHandler() {
+    const cityInput = this.getElement().querySelector(`.event__input--destination`);
+    cityInput.addEventListener(`change`, (evt) => {
+      if (evt.target.value !== this._city) {
+        this._city = evt.target.value;
+        this._description = createDescription(DescriptionItems);
+        this._showplaces = generateShowplaces();
+        this.rerender();
+      }
+    });
   }
 
   getTemplate() {
-    return createAddEventFormTemplate(this._event);
+    return createAddEventFormTemplate(this._event, {
+      type: this._type,
+      city: this._city,
+      description: this._description,
+      showplaces: this._showplaces,
+    });
   }
 
   setFormSubmitHandler(handler) {
     const form = this.getElement().querySelector(`form`);
-
     form.addEventListener(`submit`, handler);
+    this._formSubmitHandler = handler;
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, handler);
+    this._favoriteBtnClickHandler = handler;
+  }
+
+  recoveryListeners() {
+    this.setFormSubmitHandler(this._formSubmitHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteBtnClickHandler);
+
+    this._setEventTypeChangeHandler();
+    this._setCityInputChangeHandler();
+  }
+
+  reset() {
+    const event = this._event;
+
+    this._type = Object.assign({}, event.type);
+    this._city = event.city;
+    this._description = event.description.slice();
+
+    this.rerender();
+  }
+
+  rerender() {
+    super.rerender();
   }
 }
