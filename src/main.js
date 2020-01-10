@@ -1,9 +1,7 @@
 import {renderElement, RenderPosition} from './utils/render';
 import {generateEvents} from './mocks/event.js';
-// import {generateFilters} from './mocks/filters.js';
 import TripInfoComponent from './components/tripinfo.js';
 import MenuComponent from './components/menu.js';
-// import FilterComponent from './components/filter.js';
 import DayListComponent from './components/daylist.js';
 import TripController from './controllers/trip-controller';
 import PointsModel from './models/points-model';
@@ -14,13 +12,11 @@ const EVENTS_COUNT = 5;
 const events = generateEvents(EVENTS_COUNT).sort((a, b) => a.startDate - b.startDate);
 const pointsModel = new PointsModel();
 pointsModel.setPoints(events);
-// const filters = generateFilters();
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 
 const tripInfoComponent = new TripInfoComponent(events);
 const menuComponent = new MenuComponent();
-// const filtersComponent = new FilterComponent(filters);
 const tripControls = document.querySelector(`.trip-controls`);
 const filterController = new FilterController(tripControls, pointsModel);
 filterController.render();
@@ -28,7 +24,6 @@ filterController.render();
 renderElement(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
 
 renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGIN); // подумать как засунуть под h2
-// renderElement(tripControls, filtersComponent.getElement(), RenderPosition.BEFOREEND);
 
 const daysListComponent = new DayListComponent();
 const tripController = new TripController(daysListComponent, pointsModel);

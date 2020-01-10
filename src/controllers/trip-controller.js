@@ -28,7 +28,7 @@ const renderEvents = (container, events, onDataChange, onViewChange) => {
     }));
     renderElement(container, day, RenderPosition.BEFOREEND);
   });
-  return controllers.reduce((a, b) => a.concat(b));
+  return controllers.reduce((a, b) => a.concat(b), []); // если нет initialValue, то в случае отсутствия элементов, попадающих под фильтр вылетает ошибка
 };
 
 
@@ -67,14 +67,11 @@ export default class TripController {
   }
 
   _onFilterChange() {
-    // this._pointControllers.forEach((controller) => controller.destroy());
-    // this._pointControllers = [];
-    // const container = this._container.getElement();
-
     const container = this._container.getElement();
-    console.log(container);
-    container.innerHTML = ``;
-    // this._pointControllers = [];
+    this._pointControllers.forEach((controller) => controller.destroy());
+    this._pointControllers = [];
+    container.innerHTML = ``; // иначе не удаляются номера дней
+
     const events = this._pointsModel.getPoints();
 
     const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
