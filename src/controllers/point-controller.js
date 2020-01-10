@@ -64,6 +64,13 @@ export default class PointController {
     this._viewMode = ViewMode.DEFAULT;
   }
 
+  destroy() {
+    this._eventComponent.getElement().remove();
+    this._eventComponent.removeElement();
+    this._editEventComponent.getElement().remove();
+    this._editEventComponent.removeElement();
+  }
+
   setDefaultView() {
     if (this._viewMode !== ViewMode.DEFAULT) {
       this._replaceEditToEvent();

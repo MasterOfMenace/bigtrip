@@ -1,5 +1,11 @@
 const MonthNames = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOW`, `DEC`];
 
+const FilterType = {
+  ALL: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
+
 const EventTypes = {
   transportGroup: [
     {
@@ -75,4 +81,4 @@ const Offers = [
   },
 ];
 
-export {MonthNames, Offers, EventTypes, EventTypesGroups};
+export {MonthNames, Offers, EventTypes, EventTypesGroups, FilterType};

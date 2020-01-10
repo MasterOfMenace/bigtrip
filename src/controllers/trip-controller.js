@@ -33,37 +33,51 @@ const renderEvents = (container, events, onDataChange, onViewChange) => {
 
 
 export default class TripController {
-  constructor(container) {
+  constructor(container, pointsModel) {
     this._container = container;
-    this._events = [];
+
+    this._pointsModel = pointsModel;
     this._pointControllers = [];
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
+    this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
-  render(events) {
+  render() {
     const container = this._container.getElement();
-    this._events = events;
+    const events = this._pointsModel.getPoints();
 
     const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
     this._pointControllers = this._pointControllers.concat(pointControllers);
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const index = this._events.findIndex((it) => it === oldData);
+    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
-    if (index === -1) {
-      return;
+    if (isSuccess) {
+      pointController.render(newData);
     }
-
-    this._events = [].concat(this._events.slice(0, index), newData, this._events.slice(index + 1));
-
-    pointController.render(this._events[index]);
   }
 
   _onViewChange() {
     this._pointControllers.forEach((it) => {
       it.setDefaultView();
     });
+  }
+
+  _onFilterChange() {
+    // this._pointControllers.forEach((controller) => controller.destroy());
+    // this._pointControllers = [];
+    // const container = this._container.getElement();
+
+    const container = this._container.getElement();
+    console.log(container);
+    container.innerHTML = ``;
+    // this._pointControllers = [];
+    const events = this._pointsModel.getPoints();
+
+    const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
+    this._pointControllers = this._pointControllers.concat(pointControllers);
   }
 }
