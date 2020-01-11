@@ -37,6 +37,18 @@ export default class PointsModel {
     return true;
   }
 
+  removePoint(id) {
+    const index = this._points.findIndex((it) => it.id === id);
+
+    if (index === -1) {
+      return false;
+    }
+
+    this._points = [].concat(this._points.slice(0, index), this._points.slice(index + 1));
+
+    return true;
+  }
+
   setFilterChangeHandler(handler) {
     this._filterChangeHandlers.push(handler);
   }

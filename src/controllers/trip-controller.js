@@ -1,6 +1,6 @@
 import {renderElement, RenderPosition} from '../utils/render';
 import DayComponent from "../components/day";
-import PointController from './point-controller';
+import PointController, {ViewMode} from './point-controller';
 
 const renderEvents = (container, events, onDataChange, onViewChange) => {
   const controllers = [];
@@ -38,6 +38,8 @@ export default class TripController {
 
     this._pointsModel = pointsModel;
     this._pointControllers = [];
+    this._creatingPoint = null;
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
@@ -53,10 +55,43 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
-    if (isSuccess) {
-      pointController.render(newData);
+    if (oldData === null) {
+      this._creatingPoint = null;
+      if (newData === null) {
+        pointController.destroy();
+        const container = this._container.getElement();
+        this._pointControllers.forEach((controller) => controller.destroy());
+        this._pointControllers = [];
+        container.innerHTML = ``;
+
+        const events = this._pointsModel.getPoints();
+
+        const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
+        this._pointControllers = this._pointControllers.concat(pointControllers);
+      } else {
+        this._pointsModel.addPoint(newData);
+        pointController.render(newData, ViewMode.DEFAULT);
+        this._pointControllers = this._pointControllers.concat(pointController);
+      }
+    } else if (newData === null) {
+      this._pointsModel.removePoint(oldData.id);
+
+      const container = this._container.getElement();
+      this._pointControllers.forEach((controller) => controller.destroy());
+      this._pointControllers = [];
+      container.innerHTML = ``;
+
+      const events = this._pointsModel.getPoints();
+
+      const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
+      this._pointControllers = this._pointControllers.concat(pointControllers);
+    } else {
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+      if (isSuccess) {
+        pointController.render(newData);
+      }
     }
   }
 

@@ -2,9 +2,23 @@ import EventComponent from '../components/event-template';
 import EventEditFormComponent from '../components/addform';
 import {renderElement, RenderPosition, replace} from '../utils/render';
 
-const ViewMode = {
+export const ViewMode = {
+  ADD: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`
+};
+
+export const EmptyEvent = {
+  type: null,
+  city: null,
+  offers: null,
+  description: null,
+  showplaces: [],
+  startDate: null,
+  endDate: null,
+  duration: null,
+  price: ``,
+  isFavorite: false,
 };
 
 export default class PointController {
@@ -18,11 +32,11 @@ export default class PointController {
     this._editEventComponent = null;
   }
 
-  render(event) {
+  render(event, viewMode) {
     const oldEventComponent = this._eventComponent;
     const oldEditEventComponent = this._editEventComponent;
     this._eventComponent = new EventComponent(event);
-    this._editEventComponent = new EventEditFormComponent(event);
+    this._editEventComponent = new EventEditFormComponent(event, viewMode);
 
     const rollupBtnHandler = () => {
       this._replaceEventToEdit();
@@ -30,6 +44,8 @@ export default class PointController {
     const formSubmitHandler = () => {
       this._replaceEditToEvent();
     };
+
+    this._editEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
 
     this._eventComponent.setRollupBtnClickHandler(rollupBtnHandler);
     this._editEventComponent.setFormSubmitHandler(formSubmitHandler);
@@ -39,6 +55,27 @@ export default class PointController {
         isFavorite: !event.isFavorite
       }));
     });
+
+    switch (viewMode) {
+      case ViewMode.DEFAULT:
+        if (oldEventComponent && oldEditEventComponent) {
+          replace(this._eventComponent, oldEventComponent);
+          replace(this._editEventComponent, oldEditEventComponent);
+          this._replaceEditToEvent();
+        } else {
+          renderElement(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+        }
+        break;
+      case ViewMode.ADD:
+        if (oldEditEventComponent && oldEventComponent) {
+          oldEventComponent.getElement().remove();
+          oldEventComponent.removeElement();
+          oldEditEventComponent.getElement().remove();
+          oldEditEventComponent.removeElement();
+        }
+        renderElement(this._container, this._editEventComponent, RenderPosition.AFTERBEGIN);
+        break;
+    }
 
     if (oldEditEventComponent && oldEventComponent) {
       replace(this._eventComponent, oldEventComponent);

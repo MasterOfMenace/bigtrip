@@ -2,6 +2,7 @@ import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/
 import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
 import {formatTime} from '../utils/utils';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import {ViewMode} from '../controllers/point-controller';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;
@@ -125,13 +126,14 @@ const createDescriptionMarkup = (description, showplaces) => {
 
 const createAddEventFormTemplate = (event, options = {}) => {
   const {startDate, endDate, price, offers, isFavorite} = event;
-  const {type, description, city, showplaces} = options;
+  const {type, description, city, showplaces, mode} = options;
   const typeMarkup = createEventTypeMarkup(EventTypes, type);
   const destinationMarkup = createEventDestinationMarkup(type, city);
   const timesMarkup = createEventTimesMarkup(startDate, endDate);
   const checkedOffers = Array.from(offers).map((offer) => offer.type);
   const offersMarkup = Offers.map((offer) => createOfferMarkup(offer, checkedOffers)).join(`\n`);
   const descriptionMarkup = createDescriptionMarkup(description, showplaces);
+  const isAdding = mode === ViewMode.ADD;
   return (
     `<div>
     <form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -154,7 +156,7 @@ const createAddEventFormTemplate = (event, options = {}) => {
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Cancel</button>
+      <button class="event__reset-btn" type="reset">${isAdding ? `Cancel` : `Delete`}</button>
       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -186,9 +188,10 @@ const createAddEventFormTemplate = (event, options = {}) => {
 };
 
 export default class EventEditFormComponent extends AbstractSmartComponent {
-  constructor(event) {
+  constructor(event, mode) {
     super();
     this._event = event;
+    this._mode = mode;
 
     this._type = Object.assign({}, event.type);
     this._city = event.city;
@@ -197,6 +200,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
 
     this._formSubmitHandler = null;
     this._favoriteBtnClickHandler = null;
+    this._deleteButtonClickHandler = null;
     this.recoveryListeners();
   }
 
@@ -232,6 +236,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       city: this._city,
       description: this._description,
       showplaces: this._showplaces,
+      mode: this._mode,
     });
   }
 
@@ -246,12 +251,18 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._favoriteBtnClickHandler = handler;
   }
 
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
+  }
+
   recoveryListeners() {
     this.setFormSubmitHandler(this._formSubmitHandler);
     this.setFavoriteButtonClickHandler(this._favoriteBtnClickHandler);
 
     this._setEventTypeChangeHandler();
     this._setCityInputChangeHandler();
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
   }
 
   reset() {
