@@ -29,6 +29,10 @@ const daysListComponent = new DayListComponent();
 const tripController = new TripController(daysListComponent, pointsModel);
 const dayList = daysListComponent.getElement();
 
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
+  tripController.createPoint();
+});
+
 const eventsContainer = document.querySelector(`.trip-events`);
 renderElement(eventsContainer, dayList, RenderPosition.BEFOREEND);
 

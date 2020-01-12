@@ -9,10 +9,13 @@ export const ViewMode = {
 };
 
 export const EmptyEvent = {
-  type: null,
-  city: null,
-  offers: null,
-  description: null,
+  type: {
+    type: `taxi`,
+    description: `Taxi to`
+  },
+  city: ``,
+  offers: [],
+  description: [],
   showplaces: [],
   startDate: null,
   endDate: null,
@@ -32,7 +35,7 @@ export default class PointController {
     this._editEventComponent = null;
   }
 
-  render(event, viewMode) {
+  render(event, viewMode = ViewMode.DEFAULT) {
     const oldEventComponent = this._eventComponent;
     const oldEditEventComponent = this._editEventComponent;
     this._eventComponent = new EventComponent(event);
@@ -41,8 +44,10 @@ export default class PointController {
     const rollupBtnHandler = () => {
       this._replaceEventToEdit();
     };
-    const formSubmitHandler = () => {
-      this._replaceEditToEvent();
+    const formSubmitHandler = (evt) => {
+      evt.preventDefault();
+      const data = this._editEventComponent.getData();
+      this._onDataChange(this, event, data);
     };
 
     this._editEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
@@ -63,7 +68,7 @@ export default class PointController {
           replace(this._editEventComponent, oldEditEventComponent);
           this._replaceEditToEvent();
         } else {
-          renderElement(this._container, this._eventComponent, RenderPosition.BEFOREEND);
+          renderElement(this._container, this._eventComponent.getElement(), RenderPosition.BEFOREEND);
         }
         break;
       case ViewMode.ADD:
@@ -73,15 +78,8 @@ export default class PointController {
           oldEditEventComponent.getElement().remove();
           oldEditEventComponent.removeElement();
         }
-        renderElement(this._container, this._editEventComponent, RenderPosition.AFTERBEGIN);
+        renderElement(this._container, this._editEventComponent.getElement(), RenderPosition.AFTERBEGIN);
         break;
-    }
-
-    if (oldEditEventComponent && oldEventComponent) {
-      replace(this._eventComponent, oldEventComponent);
-      replace(this._editEventComponent, oldEditEventComponent);
-    } else {
-      renderElement(this._container, this._eventComponent.getElement(), RenderPosition.BEFOREEND);
     }
   }
 

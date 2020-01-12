@@ -37,6 +37,10 @@ export default class PointsModel {
     return true;
   }
 
+  addPoint(event) {
+    this._points = [].concat(event, this._points);
+  }
+
   removePoint(id) {
     const index = this._points.findIndex((it) => it.id === id);
 

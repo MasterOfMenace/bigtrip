@@ -1,6 +1,6 @@
 import {renderElement, RenderPosition} from '../utils/render';
 import DayComponent from "../components/day";
-import PointController, {ViewMode} from './point-controller';
+import PointController, {ViewMode, EmptyEvent} from './point-controller';
 
 const renderEvents = (container, events, onDataChange, onViewChange) => {
   const controllers = [];
@@ -54,9 +54,19 @@ export default class TripController {
     this._pointControllers = this._pointControllers.concat(pointControllers);
   }
 
-  _onDataChange(pointController, oldData, newData) {
+  createPoint() {
+    if (this._creatingPoint) {
+      return;
+    }
 
-    if (oldData === null) {
+    const container = this._container.getElement();
+
+    this._creatingPoint = new PointController(container, this._onDataChange, this._onViewChange);
+    this._creatingPoint.render(EmptyEvent, ViewMode.ADD);
+  }
+
+  _onDataChange(pointController, oldData, newData) {
+    if (oldData === EmptyEvent) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
@@ -71,8 +81,17 @@ export default class TripController {
         this._pointControllers = this._pointControllers.concat(pointControllers);
       } else {
         this._pointsModel.addPoint(newData);
-        pointController.render(newData, ViewMode.DEFAULT);
-        this._pointControllers = this._pointControllers.concat(pointController);
+        // pointController.render(newData, ViewMode.DEFAULT);
+        // иначе не рисуются дни
+        const container = this._container.getElement();
+        this._pointControllers.forEach((controller) => controller.destroy());
+        this._pointControllers = [];
+        container.innerHTML = ``;
+
+        const events = this._pointsModel.getPoints();
+
+        const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
+        this._pointControllers = this._pointControllers.concat(pointControllers);
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
@@ -90,7 +109,7 @@ export default class TripController {
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
       if (isSuccess) {
-        pointController.render(newData);
+        pointController.render(newData, ViewMode.DEFAULT);
       }
     }
   }
