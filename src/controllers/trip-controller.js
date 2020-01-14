@@ -2,6 +2,7 @@ import {renderElement, RenderPosition} from '../utils/render';
 import DayComponent from "../components/day";
 import PointController from './point-controller';
 import {ViewMode, EmptyEvent} from '../constants';
+import NoPointsComponent from '../components/no-points';
 
 const renderEvents = (container, events, onDataChange, onViewChange) => {
   const controllers = [];
@@ -40,6 +41,7 @@ export default class TripController {
     this._pointsModel = pointsModel;
     this._pointControllers = [];
     this._creatingPoint = null;
+    this._noPointsComponent = new NoPointsComponent();
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
@@ -50,6 +52,12 @@ export default class TripController {
   render() {
     const container = this._container.getElement();
     const events = this._pointsModel.getPoints();
+    const isNoPointsExist = events.length === 0;
+
+    if (isNoPointsExist) {
+      renderElement(container, this._noPointsComponent.getElement(), RenderPosition.BEFOREEND);
+      return;
+    }
 
     const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
     this._pointControllers = this._pointControllers.concat(pointControllers);
