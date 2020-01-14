@@ -1,6 +1,7 @@
 import {renderElement, RenderPosition} from '../utils/render';
 import DayComponent from "../components/day";
-import PointController, {ViewMode, EmptyEvent} from './point-controller';
+import PointController from './point-controller';
+import {ViewMode, EmptyEvent} from '../constants';
 
 const renderEvents = (container, events, onDataChange, onViewChange) => {
   const controllers = [];
@@ -65,46 +66,36 @@ export default class TripController {
     this._creatingPoint.render(EmptyEvent, ViewMode.ADD);
   }
 
+  _removePoints() {
+    const container = this._container.getElement();
+    this._pointControllers.forEach((controller) => controller.destroy());
+    this._pointControllers = [];
+    container.innerHTML = ``; // иначе не удаляются номера дней
+  }
+
+  _renderPoints(events) {
+    const container = this._container.getElement();
+
+    const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
+    this._pointControllers = this._pointControllers.concat(pointControllers);
+  }
+
   _onDataChange(pointController, oldData, newData) {
     if (oldData === EmptyEvent) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
-        const container = this._container.getElement();
-        this._pointControllers.forEach((controller) => controller.destroy());
-        this._pointControllers = [];
-        container.innerHTML = ``;
-
-        const events = this._pointsModel.getPoints();
-
-        const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
-        this._pointControllers = this._pointControllers.concat(pointControllers);
+        this._removePoints();
+        this._renderPoints(this._pointsModel.getPoints());
       } else {
         this._pointsModel.addPoint(newData);
-        // pointController.render(newData, ViewMode.DEFAULT);
-        // иначе не рисуются дни
-        const container = this._container.getElement();
-        this._pointControllers.forEach((controller) => controller.destroy());
-        this._pointControllers = [];
-        container.innerHTML = ``;
-
-        const events = this._pointsModel.getPoints();
-
-        const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
-        this._pointControllers = this._pointControllers.concat(pointControllers);
+        this._removePoints();
+        this._renderPoints(this._pointsModel.getPoints());
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);
-
-      const container = this._container.getElement();
-      this._pointControllers.forEach((controller) => controller.destroy());
-      this._pointControllers = [];
-      container.innerHTML = ``;
-
-      const events = this._pointsModel.getPoints();
-
-      const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
-      this._pointControllers = this._pointControllers.concat(pointControllers);
+      this._removePoints();
+      this._renderPoints(this._pointsModel.getPoints());
     } else {
       const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
@@ -121,14 +112,7 @@ export default class TripController {
   }
 
   _onFilterChange() {
-    const container = this._container.getElement();
-    this._pointControllers.forEach((controller) => controller.destroy());
-    this._pointControllers = [];
-    container.innerHTML = ``; // иначе не удаляются номера дней
-
-    const events = this._pointsModel.getPoints();
-
-    const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
-    this._pointControllers = this._pointControllers.concat(pointControllers);
+    this._removePoints();
+    this._renderPoints(this._pointsModel.getPoints());
   }
 }

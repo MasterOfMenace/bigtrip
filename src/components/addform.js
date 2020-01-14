@@ -1,8 +1,8 @@
 import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/event';
-import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
+import {Offers, EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
 import {formatTime} from '../utils/utils';
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {ViewMode} from '../controllers/point-controller';
+// import {ViewMode} from '../controllers/point-controller';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;

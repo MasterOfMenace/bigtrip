@@ -1,28 +1,7 @@
 import EventComponent from '../components/event-template';
 import EventEditFormComponent from '../components/addform';
 import {renderElement, RenderPosition, replace} from '../utils/render';
-
-export const ViewMode = {
-  ADD: `adding`,
-  DEFAULT: `default`,
-  EDIT: `edit`
-};
-
-export const EmptyEvent = {
-  type: {
-    type: `taxi`,
-    description: `Taxi to`
-  },
-  city: ``,
-  offers: [],
-  description: [],
-  showplaces: [],
-  startDate: null,
-  endDate: null,
-  duration: null,
-  price: ``,
-  isFavorite: false,
-};
+import {ViewMode} from '../constants';
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
