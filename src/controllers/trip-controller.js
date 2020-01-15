@@ -1,7 +1,7 @@
 import {renderElement, RenderPosition} from '../utils/render';
 import DayComponent from "../components/day";
 import PointController from './point-controller';
-import {ViewMode, EmptyEvent} from '../constants';
+import {ViewMode, EmptyEvent, SortType} from '../constants';
 import NoPointsComponent from '../components/no-points';
 import SortComponent from '../components/sort';
 
@@ -60,10 +60,26 @@ export default class TripController {
       renderElement(container, this._noPointsComponent.getElement(), RenderPosition.BEFOREEND);
       return;
     }
-    renderElement(container, this._sortComponent.getElement(), RenderPosition.BEFOREEND);
 
-    const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
-    this._pointControllers = this._pointControllers.concat(pointControllers);
+    this._renderPoints(events);
+
+    this._sortComponent.setSortTypeChangeHandler((sortType) => {
+      let sortedPoints = [];
+
+      switch (sortType) {
+        case SortType.EVENT:
+          sortedPoints = events;
+          break;
+        case SortType.TIME:
+          sortedPoints = events.slice().sort((a, b) => b.duration - a.duration);
+          break;
+        case SortType.PRICE:
+          sortedPoints = events.slice().sort((a, b) => b.price - a.price);
+      }
+
+      this._removePoints();
+      this._renderPoints(sortedPoints);
+    });
   }
 
   createPoint() {
@@ -86,6 +102,10 @@ export default class TripController {
 
   _renderPoints(events) {
     const container = this._container.getElement();
+
+    if (events.length > 0 || this._creatingPoint) {
+      renderElement(container, this._sortComponent.getElement(), RenderPosition.BEFOREBEGIN);
+    }
 
     const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
     this._pointControllers = this._pointControllers.concat(pointControllers);

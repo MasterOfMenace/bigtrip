@@ -1,4 +1,5 @@
 const RenderPosition = {
+  BEFOREBEGIN: `beforebegin`,
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`,
 };
@@ -17,6 +18,11 @@ const renderElement = (container, element, place) => {
       break;
     case RenderPosition.BEFOREEND:
       container.append(element);
+      break;
+    case RenderPosition.BEFOREBEGIN:
+      const parent = container.parentElement;
+      parent.insertBefore(element, container);
+      break;
   }
 };
 
