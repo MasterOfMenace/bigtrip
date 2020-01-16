@@ -6,6 +6,12 @@ export const FilterType = {
   PAST: `past`
 };
 
+export const SortType = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
 export const ViewMode = {
   ADD: `adding`,
   DEFAULT: `default`,

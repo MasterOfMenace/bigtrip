@@ -1,7 +1,7 @@
 import EventComponent from '../components/event-template';
 import EventEditFormComponent from '../components/addform';
 import {renderElement, RenderPosition, replace} from '../utils/render';
-import {ViewMode} from '../constants';
+import {ViewMode, EmptyEvent} from '../constants';
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -12,9 +12,12 @@ export default class PointController {
 
     this._eventComponent = null;
     this._editEventComponent = null;
+
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
   render(event, viewMode = ViewMode.DEFAULT) {
+    this._viewMode = viewMode;
     const oldEventComponent = this._eventComponent;
     const oldEditEventComponent = this._editEventComponent;
     this._eventComponent = new EventComponent(event);
@@ -22,6 +25,7 @@ export default class PointController {
 
     const rollupBtnHandler = () => {
       this._replaceEventToEdit();
+      document.addEventListener(`keydown`, this._onEscKeyDown);
     };
     const formSubmitHandler = (evt) => {
       evt.preventDefault();
@@ -57,6 +61,7 @@ export default class PointController {
           oldEditEventComponent.getElement().remove();
           oldEditEventComponent.removeElement();
         }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
         renderElement(this._container, this._editEventComponent.getElement(), RenderPosition.AFTERBEGIN);
         break;
     }
@@ -76,6 +81,18 @@ export default class PointController {
     replace(this._eventComponent, this._editEventComponent);
 
     this._viewMode = ViewMode.DEFAULT;
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  _onEscKeyDown(evt) {
+    const isEscPress = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscPress) {
+      if (this._viewMode === ViewMode.ADD) {
+        this._onDataChange(this, EmptyEvent, null);
+      }
+      this._replaceEditToEvent();
+    }
   }
 
   destroy() {
@@ -83,6 +100,7 @@ export default class PointController {
     this._eventComponent.removeElement();
     this._editEventComponent.getElement().remove();
     this._editEventComponent.removeElement();
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   setDefaultView() {
