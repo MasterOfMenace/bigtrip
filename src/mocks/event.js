@@ -50,6 +50,7 @@ const createEvent = () => {
   const dates = Array(2).fill(``).map(createStartDate).sort((a, b) => a - b);
 
   return {
+    id: String(getRandomNumber(0, 100) + Math.random()),
     type: createEventType(EventTypes),
     city: getRandomValue(Cities),
     offers: new Set(generateOffers(Offers)),

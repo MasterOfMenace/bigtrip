@@ -1,6 +1,34 @@
-const MonthNames = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOW`, `DEC`];
+export const MonthNames = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOW`, `DEC`];
 
-const EventTypes = {
+export const FilterType = {
+  ALL: `everything`,
+  FUTURE: `future`,
+  PAST: `past`
+};
+
+export const ViewMode = {
+  ADD: `adding`,
+  DEFAULT: `default`,
+  EDIT: `edit`
+};
+
+export const EmptyEvent = {
+  type: {
+    type: `taxi`,
+    description: `Taxi to`
+  },
+  city: ``,
+  offers: [],
+  description: [],
+  showplaces: [],
+  startDate: null,
+  endDate: null,
+  duration: null,
+  price: ``,
+  isFavorite: false,
+};
+
+export const EventTypes = {
   transportGroup: [
     {
       type: `taxi`,
@@ -47,12 +75,12 @@ const EventTypes = {
   ]
 };
 
-const EventTypesGroups = {
+export const EventTypesGroups = {
   transportGroup: `Transfer`,
   activityGroup: `Activity`,
 };
 
-const Offers = [
+export const Offers = [
   {
     type: `luggage`,
     name: `Add luggage`,
@@ -74,5 +102,3 @@ const Offers = [
     price: 9,
   },
 ];
-
-export {MonthNames, Offers, EventTypes, EventTypesGroups};

@@ -1,11 +1,7 @@
 import EventComponent from '../components/event-template';
 import EventEditFormComponent from '../components/addform';
 import {renderElement, RenderPosition, replace} from '../utils/render';
-
-const ViewMode = {
-  DEFAULT: `default`,
-  EDIT: `edit`
-};
+import {ViewMode} from '../constants';
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -18,18 +14,22 @@ export default class PointController {
     this._editEventComponent = null;
   }
 
-  render(event) {
+  render(event, viewMode = ViewMode.DEFAULT) {
     const oldEventComponent = this._eventComponent;
     const oldEditEventComponent = this._editEventComponent;
     this._eventComponent = new EventComponent(event);
-    this._editEventComponent = new EventEditFormComponent(event);
+    this._editEventComponent = new EventEditFormComponent(event, viewMode);
 
     const rollupBtnHandler = () => {
       this._replaceEventToEdit();
     };
-    const formSubmitHandler = () => {
-      this._replaceEditToEvent();
+    const formSubmitHandler = (evt) => {
+      evt.preventDefault();
+      const data = this._editEventComponent.getData();
+      this._onDataChange(this, event, data);
     };
+
+    this._editEventComponent.setDeleteButtonClickHandler(() => this._onDataChange(this, event, null));
 
     this._eventComponent.setRollupBtnClickHandler(rollupBtnHandler);
     this._editEventComponent.setFormSubmitHandler(formSubmitHandler);
@@ -40,11 +40,25 @@ export default class PointController {
       }));
     });
 
-    if (oldEditEventComponent && oldEventComponent) {
-      replace(this._eventComponent, oldEventComponent);
-      replace(this._editEventComponent, oldEditEventComponent);
-    } else {
-      renderElement(this._container, this._eventComponent.getElement(), RenderPosition.BEFOREEND);
+    switch (viewMode) {
+      case ViewMode.DEFAULT:
+        if (oldEventComponent && oldEditEventComponent) {
+          replace(this._eventComponent, oldEventComponent);
+          replace(this._editEventComponent, oldEditEventComponent);
+          this._replaceEditToEvent();
+        } else {
+          renderElement(this._container, this._eventComponent.getElement(), RenderPosition.BEFOREEND);
+        }
+        break;
+      case ViewMode.ADD:
+        if (oldEditEventComponent && oldEventComponent) {
+          oldEventComponent.getElement().remove();
+          oldEventComponent.removeElement();
+          oldEditEventComponent.getElement().remove();
+          oldEditEventComponent.removeElement();
+        }
+        renderElement(this._container, this._editEventComponent.getElement(), RenderPosition.AFTERBEGIN);
+        break;
     }
   }
 
@@ -62,6 +76,13 @@ export default class PointController {
     replace(this._eventComponent, this._editEventComponent);
 
     this._viewMode = ViewMode.DEFAULT;
+  }
+
+  destroy() {
+    this._eventComponent.getElement().remove();
+    this._eventComponent.removeElement();
+    this._editEventComponent.getElement().remove();
+    this._editEventComponent.removeElement();
   }
 
   setDefaultView() {

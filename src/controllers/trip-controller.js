@@ -1,6 +1,7 @@
 import {renderElement, RenderPosition} from '../utils/render';
 import DayComponent from "../components/day";
 import PointController from './point-controller';
+import {ViewMode, EmptyEvent} from '../constants';
 
 const renderEvents = (container, events, onDataChange, onViewChange) => {
   const controllers = [];
@@ -28,42 +29,90 @@ const renderEvents = (container, events, onDataChange, onViewChange) => {
     }));
     renderElement(container, day, RenderPosition.BEFOREEND);
   });
-  return controllers.reduce((a, b) => a.concat(b));
+  return controllers.reduce((a, b) => a.concat(b), []); // если нет initialValue, то в случае отсутствия элементов, попадающих под фильтр вылетает ошибка
 };
 
 
 export default class TripController {
-  constructor(container) {
+  constructor(container, pointsModel) {
     this._container = container;
-    this._events = [];
+
+    this._pointsModel = pointsModel;
     this._pointControllers = [];
+    this._creatingPoint = null;
+
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
+    this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
-  render(events) {
+  render() {
     const container = this._container.getElement();
-    this._events = events;
+    const events = this._pointsModel.getPoints();
+
+    const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
+    this._pointControllers = this._pointControllers.concat(pointControllers);
+  }
+
+  createPoint() {
+    if (this._creatingPoint) {
+      return;
+    }
+
+    const container = this._container.getElement();
+
+    this._creatingPoint = new PointController(container, this._onDataChange, this._onViewChange);
+    this._creatingPoint.render(EmptyEvent, ViewMode.ADD);
+  }
+
+  _removePoints() {
+    const container = this._container.getElement();
+    this._pointControllers.forEach((controller) => controller.destroy());
+    this._pointControllers = [];
+    container.innerHTML = ``; // иначе не удаляются номера дней
+  }
+
+  _renderPoints(events) {
+    const container = this._container.getElement();
 
     const pointControllers = renderEvents(container, events, this._onDataChange, this._onViewChange);
     this._pointControllers = this._pointControllers.concat(pointControllers);
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const index = this._events.findIndex((it) => it === oldData);
+    if (oldData === EmptyEvent) {
+      this._creatingPoint = null;
+      if (newData === null) {
+        pointController.destroy();
+        this._removePoints();
+        this._renderPoints(this._pointsModel.getPoints());
+      } else {
+        this._pointsModel.addPoint(newData);
+        this._removePoints();
+        this._renderPoints(this._pointsModel.getPoints());
+      }
+    } else if (newData === null) {
+      this._pointsModel.removePoint(oldData.id);
+      this._removePoints();
+      this._renderPoints(this._pointsModel.getPoints());
+    } else {
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
 
-    if (index === -1) {
-      return;
+      if (isSuccess) {
+        pointController.render(newData, ViewMode.DEFAULT);
+      }
     }
-
-    this._events = [].concat(this._events.slice(0, index), newData, this._events.slice(index + 1));
-
-    pointController.render(this._events[index]);
   }
 
   _onViewChange() {
     this._pointControllers.forEach((it) => {
       it.setDefaultView();
     });
+  }
+
+  _onFilterChange() {
+    this._removePoints();
+    this._renderPoints(this._pointsModel.getPoints());
   }
 }

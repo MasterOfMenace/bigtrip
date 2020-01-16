@@ -1,7 +1,8 @@
 import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/event';
-import {Offers, EventTypes, EventTypesGroups} from '../constants.js';
+import {Offers, EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
 import {formatTime} from '../utils/utils';
 import AbstractSmartComponent from './abstract-smart-component.js';
+// import {ViewMode} from '../controllers/point-controller';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;
@@ -91,7 +92,7 @@ const createOfferMarkup = (offer, checked) => {
   const isChecked = checked.some((checkedOffer) => checkedOffer === offer.type);
   return (
     `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${isChecked ? `checked` : ``}>
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer" value="${offer.type}" ${isChecked ? `checked` : ``}>
     <label class="event__offer-label" for="event-offer-${offer.type}-1">
       <span class="event__offer-title">${offer.name}</span>
       &plus;
@@ -125,13 +126,14 @@ const createDescriptionMarkup = (description, showplaces) => {
 
 const createAddEventFormTemplate = (event, options = {}) => {
   const {startDate, endDate, price, offers, isFavorite} = event;
-  const {type, description, city, showplaces} = options;
+  const {type, description, city, showplaces, mode} = options;
   const typeMarkup = createEventTypeMarkup(EventTypes, type);
   const destinationMarkup = createEventDestinationMarkup(type, city);
   const timesMarkup = createEventTimesMarkup(startDate, endDate);
   const checkedOffers = Array.from(offers).map((offer) => offer.type);
   const offersMarkup = Offers.map((offer) => createOfferMarkup(offer, checkedOffers)).join(`\n`);
   const descriptionMarkup = createDescriptionMarkup(description, showplaces);
+  const isAdding = mode === ViewMode.ADD;
   return (
     `<div>
     <form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -154,7 +156,7 @@ const createAddEventFormTemplate = (event, options = {}) => {
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Cancel</button>
+      <button class="event__reset-btn" type="reset">${isAdding ? `Cancel` : `Delete`}</button>
       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -185,10 +187,21 @@ const createAddEventFormTemplate = (event, options = {}) => {
   );
 };
 
+const parseFormData = (formData) => {
+  return {
+    city: formData.get(`event-destination`),
+    offers: formData.getAll(`event-offer`),
+    startDate: formData.get(`event-start-time`),
+    endDate: formData.get(`event-end-time`),
+    price: formData.get(`event-price`),
+  };
+};
+
 export default class EventEditFormComponent extends AbstractSmartComponent {
-  constructor(event) {
+  constructor(event, mode) {
     super();
     this._event = event;
+    this._mode = mode;
 
     this._type = Object.assign({}, event.type);
     this._city = event.city;
@@ -197,6 +210,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
 
     this._formSubmitHandler = null;
     this._favoriteBtnClickHandler = null;
+    this._deleteButtonClickHandler = null;
     this.recoveryListeners();
   }
 
@@ -206,7 +220,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       this._type.type = evt.target.value;
       const allTypes = Object.keys(EventTypes).map((it) => EventTypes[it]).reduce((a, b) => a.concat(b));
       allTypes.filter((it) => {
-        if (it.type === event.target.value) {
+        if (it.type === evt.target.value) {
           this._type.description = it.description;
         }
       });
@@ -232,7 +246,34 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       city: this._city,
       description: this._description,
       showplaces: this._showplaces,
+      mode: this._mode,
     });
+  }
+
+  getData() {
+    const event = this._event;
+    const form = this.getElement().querySelector(`.trip-events__item`);
+    const formData = new FormData(form);
+    const parsedData = parseFormData(formData);
+    const offersFromData = Offers.filter((offer) => { // не совсем уверен в этом коде, но вроде работает
+      const isContain = parsedData.offers.includes(offer.type);
+      if (isContain) {
+        return offer;
+      }
+      return ``;
+    });
+    return {
+      type: this._type,
+      city: parsedData.city,
+      offers: offersFromData,
+      description: this._description,
+      showplaces: this._showplaces,
+      startDate: parsedData.startDate,
+      endDate: parsedData.endDate,
+      duration: event.duration,
+      price: parsedData.price,
+      isFavorite: event.isFavorite,
+    };
   }
 
   setFormSubmitHandler(handler) {
@@ -246,12 +287,18 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._favoriteBtnClickHandler = handler;
   }
 
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+    this._deleteButtonClickHandler = handler;
+  }
+
   recoveryListeners() {
     this.setFormSubmitHandler(this._formSubmitHandler);
     this.setFavoriteButtonClickHandler(this._favoriteBtnClickHandler);
 
     this._setEventTypeChangeHandler();
     this._setCityInputChangeHandler();
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
   }
 
   reset() {
