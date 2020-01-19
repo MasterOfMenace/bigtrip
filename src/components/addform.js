@@ -2,6 +2,9 @@ import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/
 import {Offers, EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
 import {formatTime} from '../utils/utils';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
 
 const createTypeMarkup = (eventType) => {
   const {type} = eventType;
@@ -202,6 +205,9 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._event = event;
     this._mode = mode;
 
+    this._flatpickrStart = null;
+    this._flatpickrEnd = null;
+
     this._type = Object.assign({}, event.type);
     this._city = event.city;
     this._description = event.description.slice();
@@ -211,6 +217,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._favoriteBtnClickHandler = null;
     this._deleteButtonClickHandler = null;
     this.recoveryListeners();
+    this._applyFlatpickr();
   }
 
   _setEventTypeChangeHandler() {
@@ -236,6 +243,43 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
         this._showplaces = generateShowplaces();
         this.rerender();
       }
+    });
+  }
+
+  _applyFlatpickr() {
+    if (this._flatpickrStart && this._flatpickrEnd) {
+      this._flatpickrStart.destroy();
+      this._flatpickrEnd.destroy();
+      this._flatpickrStart = null;
+      this._flatpickrEnd = null;
+    }
+
+    const dateElements = this.getElement().querySelectorAll(`.event__input--time`);
+    const startDateElement = dateElements[0];
+    const endDateElement = dateElements[1];
+    let minEndDate = this._event.startDate;
+
+    this._flatpickrStart = flatpickr(startDateElement, {
+      // altInput: true,
+      allowInput: true,
+      defaultDate: this._event.startDate,
+      dateFormat: `d/m/y H:i`,
+      // altFormat: `d/m/y H:i`,
+      onChange(selectedDate) {
+        minEndDate = Date.parse(selectedDate);
+      }
+    });
+
+    this._flatpickrEnd = flatpickr(endDateElement, {
+      // altInput: true,
+      allowInput: true,
+      defaultDate: this._event.endDate,
+      dateFormat: `d/m/y H:i`,
+      minDate: minEndDate,
+      onOpen() {
+        this.config.minDate = minEndDate;
+      }
+
     });
   }
 
@@ -312,5 +356,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
 
   rerender() {
     super.rerender();
+
+    this._applyFlatpickr();
   }
 }
