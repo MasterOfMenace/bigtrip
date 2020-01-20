@@ -97,7 +97,7 @@ export default class TripController {
     const container = this._container.getElement();
     this._pointControllers.forEach((controller) => controller.destroy());
     this._pointControllers = [];
-    container.innerHTML = ``; // иначе не удаляются номера дней
+    container.innerHTML = ``;
   }
 
   _renderPoints(events) {

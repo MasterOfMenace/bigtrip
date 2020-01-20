@@ -1,6 +1,5 @@
 import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/event';
 import {Offers, EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
-import {formatTime} from '../utils/utils';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -74,18 +73,16 @@ const createEventDestinationMarkup = (eventType, city) => {
 const createEventTimesMarkup = (startTime, endTime) => {
   startTime = new Date(startTime);
   endTime = new Date(endTime);
-  const startTimeFormatted = `${startTime.getFullYear()}/${startTime.getMonth() + 1}/${startTime.getDate()} ${formatTime(startTime.getHours())}:${formatTime(startTime.getMinutes())}`;
-  const endTimeFormatted = `${endTime.getFullYear()}/${endTime.getMonth() + 1}/${endTime.getDate()} ${formatTime(endTime.getHours())}:${formatTime(endTime.getMinutes())}`;
   return (
     `<label class="visually-hidden" for="event-start-time-1">
     From
     </label>
-    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value='${startTimeFormatted}'>
+    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value='${startTime}'>
     &mdash;
     <label class="visually-hidden" for="event-end-time-1">
       To
     </label>
-    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value='${endTimeFormatted}'>`
+    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value='${endTime}'>`
   );
 };
 
@@ -190,11 +187,13 @@ const createAddEventFormTemplate = (event, options = {}) => {
 };
 
 const parseFormData = (formData) => {
+  const start = formData.get(`event-start-time`);
+  const end = formData.get(`event-end-time`);
   return {
     city: formData.get(`event-destination`),
     offers: formData.getAll(`event-offer`),
-    startDate: formData.get(`event-start-time`),
-    endDate: formData.get(`event-end-time`),
+    startDate: new Date(start),
+    endDate: new Date(end),
     price: formData.get(`event-price`),
   };
 };
@@ -260,21 +259,22 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     let minEndDate = this._event.startDate;
 
     this._flatpickrStart = flatpickr(startDateElement, {
-      // altInput: true,
+      altInput: true,
       allowInput: true,
       defaultDate: this._event.startDate,
-      dateFormat: `d/m/y H:i`,
-      // altFormat: `d/m/y H:i`,
+      dateFormat: `Z`,
+      altFormat: `d/m/y H:i`,
       onChange(selectedDate) {
         minEndDate = Date.parse(selectedDate);
       }
     });
 
     this._flatpickrEnd = flatpickr(endDateElement, {
-      // altInput: true,
+      altInput: true,
       allowInput: true,
       defaultDate: this._event.endDate,
-      dateFormat: `d/m/y H:i`,
+      altFormat: `d/m/y H:i`,
+      dateFormat: `Z`,
       minDate: minEndDate,
       onOpen() {
         this.config.minDate = minEndDate;
@@ -298,13 +298,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     const form = this.getElement().querySelector(`.trip-events__item`);
     const formData = new FormData(form);
     const parsedData = parseFormData(formData);
-    const offersFromData = Offers.filter((offer) => { // не совсем уверен в этом коде, но вроде работает
-      const isContain = parsedData.offers.includes(offer.type);
-      if (isContain) {
-        return offer;
-      }
-      return ``;
-    });
+    const offersFromData = Offers.filter((offer) => parsedData.offers.includes(offer.type));
     return {
       type: this._type,
       city: parsedData.city,

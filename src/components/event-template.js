@@ -1,13 +1,5 @@
-import {formatTime} from '../utils/utils';
+import {formatTime, getDuration} from '../utils/utils';
 import AbstractComponent from './abstract-component.js';
-
-const getDuration = (timestamp) => {
-  const duration = new Date(timestamp);
-  const days = duration.getDate() > 0 ? `${duration.getDate()}D` : ``;
-  const hours = duration.getHours() > 0 ? `${duration.getHours()}H` : ``;
-  const minutes = `${duration.getMinutes()}M`;
-  return `${formatTime(days)} ${formatTime(hours)} ${formatTime(minutes)}`;
-};
 
 const createEventTypeMarkup = (eventType, destination) => {
   const {type, description} = eventType;
@@ -34,9 +26,7 @@ const createOffersMarkup = (offers) => {
 };
 
 const createEventTemplate = (event) => {
-  const {type, city, offers, startDate, endDate, duration, price} = event;
-  const dateStart = new Date(startDate);
-  const dateEnd = new Date(endDate);
+  const {type, city, offers, startDate, endDate, price} = event;
 
   const eventTypeMarkup = createEventTypeMarkup(type, city);
   return (
@@ -45,11 +35,11 @@ const createEventTemplate = (event) => {
         ${eventTypeMarkup}
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time">${formatTime(dateStart.getHours())}:${formatTime(dateStart.getMinutes())}</time>
+            <time class="event__start-time">${formatTime(startDate)}</time>
             &mdash;
-            <time class="event__end-time">${formatTime(dateEnd.getHours())}:${formatTime(dateEnd.getMinutes())}</time>
+            <time class="event__end-time">${formatTime(endDate)}</time>
           </p>
-          <p class="event__duration">${getDuration(duration)}</p>
+          <p class="event__duration">${getDuration(startDate, endDate)}</p>
         </div>
 
         <p class="event__price">
