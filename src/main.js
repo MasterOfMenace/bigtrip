@@ -1,7 +1,7 @@
 import {renderElement, RenderPosition} from './utils/render';
 import {generateEvents} from './mocks/event.js';
 import TripInfoComponent from './components/tripinfo.js';
-import MenuComponent from './components/menu.js';
+import MenuComponent, {MenuItem} from './components/menu.js';
 import DayListComponent from './components/daylist.js';
 import TripController from './controllers/trip-controller';
 import PointsModel from './models/points-model';
@@ -37,3 +37,14 @@ const eventsContainer = document.querySelector(`.trip-events`);
 renderElement(eventsContainer, dayList, RenderPosition.BEFOREEND);
 
 tripController.render();
+
+menuComponent.setOnClick((menuItem) => {
+  switch (menuItem) {
+    case MenuItem.TABLE:
+      menuComponent.setActiveItem(MenuItem.TABLE);
+      break;
+    case MenuItem.STATISTIC:
+      menuComponent.setActiveItem(MenuItem.STATISTIC);
+      break;
+  }
+});
