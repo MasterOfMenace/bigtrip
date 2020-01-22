@@ -31,7 +31,7 @@ renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGI
 const daysListComponent = new DayListComponent();
 const tripController = new TripController(daysListComponent, pointsModel);
 const dayList = daysListComponent.getElement();
-const statisticsComponent = new StatisticsComponent();
+const statisticsComponent = new StatisticsComponent({events: pointsModel});
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
   tripController.createPoint();
