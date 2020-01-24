@@ -2,7 +2,7 @@ import {MonthNames} from '../constants.js';
 import AbstractComponent from './abstract-component.js';
 
 const getCities = (events) => {
-  const cities = events.map((event) => event.city);
+  const cities = events.map((event) => event.destination.name);
   const startCity = cities[0];
   const endCity = cities[cities.length - 1];
   return [
@@ -12,7 +12,7 @@ const getCities = (events) => {
 };
 
 const getDates = (events) => {
-  const dates = events.map((event) => event.startDate);
+  const dates = events.map((event) => event.dateFrom);
   const startDate = dates[0];
   const endDate = dates[dates.length - 1];
 

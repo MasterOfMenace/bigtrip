@@ -4,11 +4,14 @@ import {renderElement, RenderPosition, replace} from '../utils/render';
 import {ViewMode, EmptyEvent} from '../constants';
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, offers, destinations) {
     this._container = container;
     this._viewMode = ViewMode.DEFAULT;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+
+    this._offers = offers;
+    this._destinations = destinations;
 
     this._eventComponent = null;
     this._editEventComponent = null;
@@ -21,7 +24,7 @@ export default class PointController {
     const oldEventComponent = this._eventComponent;
     const oldEditEventComponent = this._editEventComponent;
     this._eventComponent = new EventComponent(event);
-    this._editEventComponent = new EventEditFormComponent(event, viewMode);
+    this._editEventComponent = new EventEditFormComponent(event, viewMode, this._destinations, this._offers);
 
     const rollupBtnHandler = () => {
       this._replaceEventToEdit();
