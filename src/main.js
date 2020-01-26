@@ -18,7 +18,8 @@ const api = new Api(END_POINT, AUTHORIZATION);
 const pointsModel = new PointsModel();
 // pointsModel.setPoints(events);
 
-const tripInfoContainer = document.querySelector(`.trip-info`);
+// const tripInfoContainer = document.querySelector(`.trip-info`);
+const tripInfoContainer = document.querySelector(`.trip-main`);
 
 // const tripInfoComponent = new TripInfoComponent(events);
 const menuComponent = new MenuComponent();

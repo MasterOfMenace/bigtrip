@@ -31,12 +31,29 @@ const createTripInfoTemplate = (events) => {
   const startDay = startDate.getDate();
   const endMonth = MonthNames[endDate.getMonth()];
   const endDay = endDate.getDate();
+
+  const eventsCost = events.reduce((acc, current) => {
+    return acc + current.basePrice;
+  }, 0);
+
+  const offers = events.reduce((a, b) => {
+    return a.concat(b.offers);
+  }, []);
+
+  const offersPrice = offers.reduce((a, b) => a + b.price, 0);
+  const totalPrice = eventsCost + offersPrice;
+
   return (
-    `<div class="trip-info__main">
+    `<section class="trip-main__trip-info  trip-info">
+    <div class="trip-info__main">
       <h1 class="trip-info__title">${startCity} &mdash; ... &mdash; ${endCity}</h1>
 
       <p class="trip-info__dates">${startMonth} ${startDay}&nbsp;&mdash;&nbsp;${endMonth} ${endDay}</p>
-    </div>`
+    </div>
+    <p class="trip-info__cost">
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${totalPrice}</span>
+    </p>
+    </section>`
   );
 };
 
