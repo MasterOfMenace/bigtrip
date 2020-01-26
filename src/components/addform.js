@@ -1,5 +1,4 @@
-// import {createDescription, DescriptionItems, generateShowplaces} from '../mocks/event';
-import {Offers, EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
+import {EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -18,7 +17,7 @@ const createTypeMarkup = (eventType) => {
 
 const createTypeRadioMarkup = (eventType, checked) => {
   const {type, description} = eventType;
-  const isChecked = checked === eventType;
+  const isChecked = checked === eventType.type;
 
   return (
     `
@@ -33,7 +32,7 @@ const createTypeRadioMarkup = (eventType, checked) => {
 const createEventTypeMarkup = (types, currentType) => {
   const evtType = createTypeMarkup(currentType);
   const typesList = Object.keys(types);
-  const evtTypesMarkup = typesList.map((it) => createGroups(types[it], currentType.type, EventTypesGroups[it])).join(`\n`);
+  const evtTypesMarkup = typesList.map((it) => createGroups(types[it], currentType, EventTypesGroups[it])).join(`\n`);
 
   return (
     `<div class="event__type-wrapper">
@@ -127,7 +126,7 @@ const createDescriptionMarkup = (description, showplaces) => {
   );
 };
 
-const getOffersByType = (offers, eventType) => {
+export const getOffersByType = (offers, eventType) => {
   const offerModel = offers.filter((it) => it.type === eventType).pop();
   return offerModel.offers;
 };
@@ -200,18 +199,6 @@ const createAddEventFormTemplate = (event, destinations, allOffers, options = {}
   );
 };
 
-const parseFormData = (formData) => {
-  const start = formData.get(`event-start-time`);
-  const end = formData.get(`event-end-time`);
-  return {
-    city: formData.get(`event-destination`),
-    offers: formData.getAll(`event-offer`),
-    dateFrom: new Date(start),
-    dateTo: new Date(end),
-    basePrice: formData.get(`event-price`),
-  };
-};
-
 export default class EventEditFormComponent extends AbstractSmartComponent {
   constructor(event, mode, allDestinations, allOffers) {
     super();
@@ -223,13 +210,9 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._flatpickrStart = null;
     this._flatpickrEnd = null;
 
-    // this._type = Object.assign({}, event.type);
     this._type = event.type;
-    // this._city = event.city;
     this._city = event.destination.name;
-    // this._description = event.description.slice();
     this._description = event.destination.description;
-    // this._showplaces = event.showplaces.slice();
     this._showplaces = event.destination.pictures.slice();
 
     this._formSubmitHandler = null;
@@ -252,8 +235,9 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     cityInput.addEventListener(`change`, (evt) => {
       if (evt.target.value !== this._city) {
         this._city = evt.target.value;
-        // this._description = createDescription(DescriptionItems);
-        // this._showplaces = generateShowplaces();
+        const destination = this._allDestinations.filter((it) => it.name === evt.target.value).pop();
+        this._description = destination.description;
+        this._showplaces = destination.pictures.slice();
         this.rerender();
       }
     });
@@ -308,23 +292,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
   }
 
   getData() {
-    const event = this._event;
     const form = this.getElement().querySelector(`.trip-events__item`);
-    const formData = new FormData(form);
-    const parsedData = parseFormData(formData);
-    const offersFromData = Offers.filter((offer) => parsedData.offers.includes(offer.type));
-    return {
-      type: this._type,
-      city: parsedData.city,
-      offers: offersFromData,
-      description: this._description,
-      showplaces: this._showplaces,
-      dateFrom: parsedData.dateFrom,
-      dateTo: parsedData.dateTo,
-      duration: event.duration,
-      basePrice: parsedData.basePrice,
-      isFavorite: event.isFavorite,
-    };
+    return new FormData(form);
   }
 
   setFormSubmitHandler(handler) {
@@ -355,10 +324,9 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
   reset() {
     const event = this._event;
 
-    this._type = Object.assign({}, event.type);
-    this._city = event.city;
-    // this._description = event.description.slice();
-    this._description = event.description;
+    this._type = event.type;
+    this._city = event.destination.name;
+    this.description = event.destination.description;
 
     this.rerender();
   }

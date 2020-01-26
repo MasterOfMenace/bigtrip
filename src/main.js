@@ -31,7 +31,7 @@ filterController.render();
 renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGIN); // подумать как засунуть под h2
 
 const daysListComponent = new DayListComponent();
-const tripController = new TripController(daysListComponent, pointsModel);
+const tripController = new TripController(daysListComponent, pointsModel, api);
 const dayList = daysListComponent.getElement();
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {

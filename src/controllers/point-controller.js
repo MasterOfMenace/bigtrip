@@ -1,7 +1,30 @@
 import EventComponent from '../components/event-template';
-import EventEditFormComponent from '../components/addform';
+import EventEditFormComponent, {getOffersByType} from '../components/addform';
 import {renderElement, RenderPosition, replace} from '../utils/render';
 import {ViewMode, EmptyEvent} from '../constants';
+import PointModel from '../models/point-model';
+
+const parseFormData = (event, offers, destinations, formData) => {
+  const start = formData.get(`event-start-time`);
+  const end = formData.get(`event-end-time`);
+  const city = formData.get(`event-destination`);
+  const type = formData.get(`event-type`);
+  const destination = destinations.filter((it) => it.name === city).pop();
+  const offersFromForm = formData.getAll(`event-offer`);
+  const currentOffersByType = getOffersByType(offers, type);
+  const checkedOffers = currentOffersByType.filter((offer) => offersFromForm.includes(offer.title));
+
+  return new PointModel({
+    'id': event.id,
+    'type': type,
+    'destination': destination,
+    'offers': checkedOffers,
+    'date_from': new Date(start),
+    'date_to': new Date(end),
+    'base_price': Number(formData.get(`event-price`)),
+    'is_favorite': event.isFavorite,
+  });
+};
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange, offers, destinations) {
@@ -32,7 +55,8 @@ export default class PointController {
     };
     const formSubmitHandler = (evt) => {
       evt.preventDefault();
-      const data = this._editEventComponent.getData();
+      const formData = this._editEventComponent.getData();
+      const data = parseFormData(event, this._offers, this._destinations, formData);
       this._onDataChange(this, event, data);
     };
 
@@ -42,9 +66,9 @@ export default class PointController {
     this._editEventComponent.setFormSubmitHandler(formSubmitHandler);
 
     this._editEventComponent.setFavoriteButtonClickHandler(() => {
-      this._onDataChange(this, event, Object.assign({}, event, {
-        isFavorite: !event.isFavorite
-      }));
+      const newPoint = PointModel.clone(event);
+      newPoint.isFavorite = !newPoint.isFavorite;
+      this._onDataChange(this, event, newPoint);
     });
 
     switch (viewMode) {

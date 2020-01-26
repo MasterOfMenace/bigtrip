@@ -36,8 +36,10 @@ const renderEvents = (container, events, onDataChange, onViewChange, destination
 
 
 export default class TripController {
-  constructor(container, pointsModel) {
+  constructor(container, pointsModel, api) {
     this._container = container;
+
+    this._api = api;
 
     this._pointsModel = pointsModel;
     this._pointControllers = [];
@@ -128,11 +130,14 @@ export default class TripController {
       this._removePoints();
       this._renderPoints(this._pointsModel.getPoints());
     } else {
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+      this._api.updatePoint(oldData.id, newData)
+      .then((pointModel) => {
+        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
-      if (isSuccess) {
-        pointController.render(newData, ViewMode.DEFAULT);
-      }
+        if (isSuccess) {
+          pointController.render(newData, ViewMode.DEFAULT);
+        }
+      });
     }
   }
 
