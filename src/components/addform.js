@@ -112,6 +112,10 @@ const createShowplaceImageMarkup = (showplace) => {
 };
 
 const createDescriptionMarkup = (description, showplaces) => {
+  if (!description) {
+    return ``;
+  }
+
   const showplacesMarkup = showplaces.map((it) => createShowplaceImageMarkup(it)).join(`\n`);
   return (
     `<section class="event__section  event__section--destination">
@@ -212,7 +216,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
 
     this._type = event.type;
     this._city = event.destination.name;
-    this._description = event.destination.description;
+    this._description = event.destination.description ? event.destination.description : null;
     this._showplaces = event.destination.pictures.slice();
 
     this._formSubmitHandler = null;

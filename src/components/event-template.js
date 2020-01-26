@@ -17,6 +17,7 @@ const createEventTypeMarkup = (eventType, destination) => {
 };
 
 const createOffersMarkup = (offers) => {
+  offers = offers.slice(0, 3);
   return offers.map((offer) => {
     return (
       `<li class="event__offer">
