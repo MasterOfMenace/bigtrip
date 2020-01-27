@@ -18,13 +18,15 @@ const tripInfoContainer = document.querySelector(`.trip-main`);
 
 const menuComponent = new MenuComponent();
 const tripControls = document.querySelector(`.trip-controls`);
+const tripInfoComponent = new TripInfoComponent();
+
 const filterController = new FilterController(tripControls, pointsModel);
 filterController.render();
 
 renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGIN); // подумать как засунуть под h2
 
 const daysListComponent = new DayListComponent();
-const tripController = new TripController(daysListComponent, pointsModel, api);
+const tripController = new TripController(daysListComponent, pointsModel, api, tripInfoComponent);
 const dayList = daysListComponent.getElement();
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
@@ -36,7 +38,7 @@ renderElement(eventsContainer, dayList, RenderPosition.BEFOREEND);
 
 api.getPoints()
 .then((points) => {
-  const tripInfoComponent = new TripInfoComponent(points);
+  tripInfoComponent.setEvents(points);
   renderElement(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
   pointsModel.setPoints(points);
 })

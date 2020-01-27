@@ -1,5 +1,5 @@
 import {MonthNames} from '../constants.js';
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component';
 
 const getCities = (events) => {
   const cities = events.map((event) => event.destination.name);
@@ -57,13 +57,30 @@ const createTripInfoTemplate = (events) => {
   );
 };
 
-export default class TripInfoComponent extends AbstractComponent {
-  constructor(events) {
+export default class TripInfoComponent extends AbstractSmartComponent {
+  constructor() {
     super();
-    this._events = events;
+
+    this._events = null;
+  }
+
+  recoveryListeners() {
+
   }
 
   getTemplate() {
     return createTripInfoTemplate(this._events);
+  }
+
+  setEvents(events) {
+    this._events = events;
+  }
+
+  resetEvents(newEvents) {
+    this._events = newEvents;
+  }
+
+  rerender() {
+    super.rerender();
   }
 }

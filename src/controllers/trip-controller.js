@@ -36,7 +36,7 @@ const renderEvents = (container, events, onDataChange, onViewChange, destination
 
 
 export default class TripController {
-  constructor(container, pointsModel, api) {
+  constructor(container, pointsModel, api, tripInfoComponent) {
     this._container = container;
 
     this._api = api;
@@ -46,6 +46,8 @@ export default class TripController {
     this._creatingPoint = null;
     this._sortComponent = new SortComponent();
     this._noPointsComponent = new NoPointsComponent();
+
+    this._tripInfoComponent = tripInfoComponent;
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
@@ -136,6 +138,8 @@ export default class TripController {
 
         if (isSuccess) {
           pointController.render(newData, ViewMode.DEFAULT);
+          this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
+          this._tripInfoComponent.rerender();
         }
       });
     }
