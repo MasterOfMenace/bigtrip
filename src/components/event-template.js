@@ -1,23 +1,27 @@
 import {formatTime, getDuration} from '../utils/utils';
 import AbstractComponent from './abstract-component.js';
+import {EventTypes} from '../constants';
 
 const createEventTypeMarkup = (eventType, destination) => {
-  const {type, description} = eventType;
-  const url = `img/icons/${type}.png`;
+  const typesList = Object.values(EventTypes).reduce((a, b) => a.concat(b));
+  const typeDescription = typesList.find((it) => it.type === eventType).description;
+
+  const url = `img/icons/${eventType}.png`;
 
   return (
     `<div class="event__type">
       <img class="event__type-icon" width="42" height="42" src=${url} alt="Event type icon">
     </div>
-    <h3 class="event__title">${description} ${destination}</h3>`
+    <h3 class="event__title">${typeDescription} ${destination}</h3>`
   );
 };
 
 const createOffersMarkup = (offers) => {
+  offers = offers.slice(0, 3);
   return offers.map((offer) => {
     return (
       `<li class="event__offer">
-        <span class="event__offer-title">${offer.name}</span>
+        <span class="event__offer-title">${offer.title}</span>
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
       </li>`
@@ -26,7 +30,9 @@ const createOffersMarkup = (offers) => {
 };
 
 const createEventTemplate = (event) => {
-  const {type, city, offers, startDate, endDate, price} = event;
+  const {type, offers, dateFrom, dateTo, basePrice, destination} = event;
+  const city = destination.name;
+
 
   const eventTypeMarkup = createEventTypeMarkup(type, city);
   return (
@@ -35,15 +41,15 @@ const createEventTemplate = (event) => {
         ${eventTypeMarkup}
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time">${formatTime(startDate)}</time>
+            <time class="event__start-time">${formatTime(dateFrom)}</time>
             &mdash;
-            <time class="event__end-time">${formatTime(endDate)}</time>
+            <time class="event__end-time">${formatTime(dateTo)}</time>
           </p>
-          <p class="event__duration">${getDuration(startDate, endDate)}</p>
+          <p class="event__duration">${getDuration(dateFrom, dateTo)}</p>
         </div>
 
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>

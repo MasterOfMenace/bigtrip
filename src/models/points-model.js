@@ -4,6 +4,9 @@ import {getEventsByFilter} from "../utils/filter";
 export default class PointsModel {
   constructor() {
     this._points = [];
+
+    this._destinations = [];
+    this._offers = [];
     this._activeFilter = FilterType.ALL;
     this._filterChangeHandlers = [];
   }
@@ -14,6 +17,22 @@ export default class PointsModel {
 
   getPointsAll() {
     return this._points;
+  }
+
+  getDestinations() {
+    return this._destinations;
+  }
+
+  getOffers() {
+    return this._offers;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
+  }
+
+  setDestinations(destinations) {
+    this._destinations = destinations;
   }
 
   setPoints(events) {
