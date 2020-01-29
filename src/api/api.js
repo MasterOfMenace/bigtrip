@@ -51,6 +51,26 @@ export default class Api {
     });
   }
 
+  createPoint(data) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(data.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json())
+      .then((point) => {
+        return PointModel.parsePoint(point);
+      });
+  }
+
+  deletePoint(id) {
+    return this._load({
+      url: `points/${id}`,
+      method: Method.DELETE
+    });
+  }
+
   _load({url, method, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
 

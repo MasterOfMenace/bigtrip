@@ -61,14 +61,13 @@ const createEventDestinationCityMarkup = (destinations) => {
 };
 
 const createEventDestinationMarkup = (eventType, destinations, destination) => {
-  // вынести в отдельную функцию?
   const typesList = Object.values(EventTypes).reduce((a, b) => a.concat(b));
   const typeDescription = typesList.find((it) => it.type === eventType).description;
 
   return (`<label class="event__label  event__type-output" for="event-destination-1">
   ${typeDescription}
   </label>
-  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value='${destination}' list="destination-list-1">
+  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value='${destination ? destination : ``}' list="destination-list-1" placeholder='${destination ? `` : `choose your destination`}' autocomplete="off">
   <datalist id="destination-list-1">
     ${createEventDestinationCityMarkup(destinations)}
   </datalist>`);
@@ -215,9 +214,9 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._flatpickrEnd = null;
 
     this._type = event.type;
-    this._city = event.destination.name;
+    this._city = event.destination.name ? event.destination.name : null;
     this._description = event.destination.description ? event.destination.description : null;
-    this._showplaces = event.destination.pictures.slice();
+    this._showplaces = this._description ? event.destination.pictures.slice() : null;
 
     this._formSubmitHandler = null;
     this._favoriteBtnClickHandler = null;
