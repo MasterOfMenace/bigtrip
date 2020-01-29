@@ -4,6 +4,8 @@ import {renderElement, RenderPosition, replace} from '../utils/render';
 import {ViewMode, EmptyEvent} from '../constants';
 import PointModel from '../models/point-model';
 
+const SHAKE_TIMEOUT = 600;
+
 const parseFormData = (event, offers, destinations, formData) => {
   const start = formData.get(`event-start-time`);
   const end = formData.get(`event-end-time`);
@@ -55,6 +57,17 @@ export default class PointController {
     };
     const formSubmitHandler = (evt) => {
       evt.preventDefault();
+
+      this._editEventComponent.setData({
+        saveButtonText: `Saving...`
+      });
+
+      const form = this._editEventComponent.getElement().querySelector(`.trip-events__item`);
+      form.classList.add(`event--blocked`);
+      const submitButton = this._editEventComponent.getElement().querySelector(`.event__save-btn`);
+      const deleteButton = this._editEventComponent.getElement().querySelector(`.event__reset-btn`);
+      submitButton.setAttribute(`disabled`, `true`);
+      deleteButton.setAttribute(`disabled`, `true`);
       const formData = this._editEventComponent.getData();
       const data = parseFormData(event, this._offers, this._destinations, formData);
       this._onDataChange(this, event, data);
@@ -134,5 +147,20 @@ export default class PointController {
     if (this._viewMode !== ViewMode.DEFAULT) {
       this._replaceEditToEvent();
     }
+  }
+
+  shake() {
+    this._editEventComponent.getElement().style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
+    this._eventComponent.getElement().style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._editEventComponent.getElement().style.animation = ``;
+      this._eventComponent.getElement().style.animation = ``;
+
+      this._editEventComponent.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`
+      });
+    }, SHAKE_TIMEOUT);
   }
 }

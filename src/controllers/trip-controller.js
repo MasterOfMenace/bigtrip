@@ -131,7 +131,8 @@ export default class TripController {
             this._renderPoints(this._pointsModel.getPoints());
             this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
             this._tripInfoComponent.rerender();
-          });
+          })
+          .catch(() => pointController.shake());
       }
     } else if (newData === null) {
       this._api.deletePoint(oldData.id)
@@ -141,18 +142,20 @@ export default class TripController {
           this._renderPoints(this._pointsModel.getPoints());
           this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
           this._tripInfoComponent.rerender();
-        });
+        })
+        .catch(() => pointController.shake());
     } else {
       this._api.updatePoint(oldData.id, newData)
-      .then((pointModel) => {
-        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
+        .then((pointModel) => {
+          const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
 
-        if (isSuccess) {
-          pointController.render(newData, ViewMode.DEFAULT);
-          this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
-          this._tripInfoComponent.rerender();
-        }
-      });
+          if (isSuccess) {
+            pointController.render(newData, ViewMode.DEFAULT);
+            this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
+            this._tripInfoComponent.rerender();
+          }
+        })
+        .catch(() => pointController.shake());
     }
   }
 
