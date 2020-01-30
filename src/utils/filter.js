@@ -2,14 +2,14 @@ import {FilterType} from "../constants";
 
 const getFutureEvents = (events, date) => {
   return events.filter((event) => {
-    const startDate = event.startDate;
+    const startDate = new Date(event.dateFrom);
     return date < startDate;
   });
 };
 
 const getPastEvents = (events, date) => {
   return events.filter((event) => {
-    const startDate = event.startDate;
+    const startDate = new Date(event.dateFrom);
     return date > startDate;
   });
 };

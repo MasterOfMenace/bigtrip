@@ -4,6 +4,7 @@ import PointController from './point-controller';
 import {ViewMode, EmptyEvent, SortType} from '../constants';
 import NoPointsComponent from '../components/no-points';
 import SortComponent from '../components/sort';
+import {getDuration} from '../utils/utils';
 
 const renderEvents = (container, events, onDataChange, onViewChange, destinations, offers) => {
   const controllers = [];
@@ -75,10 +76,10 @@ export default class TripController {
           sortedPoints = events;
           break;
         case SortType.TIME:
-          sortedPoints = events.slice().sort((a, b) => b.duration - a.duration);
+          sortedPoints = events.slice().sort((a, b) => getDuration(b) - getDuration(a));
           break;
         case SortType.PRICE:
-          sortedPoints = events.slice().sort((a, b) => b.price - a.price);
+          sortedPoints = events.slice().sort((a, b) => b.basePrice - a.basePrice);
       }
 
       this._removePoints();
@@ -93,7 +94,7 @@ export default class TripController {
 
     const container = this._container.getElement();
 
-    this._creatingPoint = new PointController(container, this._onDataChange, this._onViewChange);
+    this._creatingPoint = new PointController(container, this._onDataChange, this._onViewChange, this._pointsModel.getOffers(), this._pointsModel.getDestinations());
     this._creatingPoint.render(EmptyEvent, ViewMode.ADD);
   }
 
@@ -123,25 +124,38 @@ export default class TripController {
         this._removePoints();
         this._renderPoints(this._pointsModel.getPoints());
       } else {
-        this._pointsModel.addPoint(newData);
-        this._removePoints();
-        this._renderPoints(this._pointsModel.getPoints());
+        this._api.createPoint(newData)
+          .then((pointModel) => {
+            this._pointsModel.addPoint(pointModel);
+            this._removePoints();
+            this._renderPoints(this._pointsModel.getPoints());
+            this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
+            this._tripInfoComponent.rerender();
+          })
+          .catch(() => pointController.shake());
       }
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
-      this._removePoints();
-      this._renderPoints(this._pointsModel.getPoints());
-    } else {
-      this._api.updatePoint(oldData.id, newData)
-      .then((pointModel) => {
-        const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
-
-        if (isSuccess) {
-          pointController.render(newData, ViewMode.DEFAULT);
+      this._api.deletePoint(oldData.id)
+        .then(() => {
+          this._pointsModel.removePoint(oldData.id);
+          this._removePoints();
+          this._renderPoints(this._pointsModel.getPoints());
           this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
           this._tripInfoComponent.rerender();
-        }
-      });
+        })
+        .catch(() => pointController.shake());
+    } else {
+      this._api.updatePoint(oldData.id, newData)
+        .then((pointModel) => {
+          const isSuccess = this._pointsModel.updatePoint(oldData.id, pointModel);
+
+          if (isSuccess) {
+            pointController.render(newData, ViewMode.DEFAULT);
+            this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
+            this._tripInfoComponent.rerender();
+          }
+        })
+        .catch(() => pointController.shake());
     }
   }
 

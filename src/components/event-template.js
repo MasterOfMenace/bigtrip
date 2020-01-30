@@ -29,6 +29,19 @@ const createOffersMarkup = (offers) => {
   }).join(`\n`);
 };
 
+const createDurationMarkup = (event) => {
+  const duration = getDuration(event);
+
+  const days = duration.get(`days`);
+  const hours = duration.get(`hours`);
+  const minutes = duration.get(`minutes`);
+  const daysFormatted = days <= 0 ? `` : `${days < 10 ? `0${days}D` : `${days}D`}`;
+  const hoursFormatted = hours <= 0 ? `` : `${hours < 10 ? `0${hours}H` : `${hours}H`}`;
+  const minutesFormatted = minutes <= 0 ? `` : `${minutes < 10 ? `0${minutes}M` : `${minutes}M`}`;
+
+  return `${daysFormatted} ${hoursFormatted} ${minutesFormatted}`;
+};
+
 const createEventTemplate = (event) => {
   const {type, offers, dateFrom, dateTo, basePrice, destination} = event;
   const city = destination.name;
@@ -45,7 +58,7 @@ const createEventTemplate = (event) => {
             &mdash;
             <time class="event__end-time">${formatTime(dateTo)}</time>
           </p>
-          <p class="event__duration">${getDuration(dateFrom, dateTo)}</p>
+          <p class="event__duration">${createDurationMarkup(event)}</p>
         </div>
 
         <p class="event__price">

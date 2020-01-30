@@ -19,18 +19,20 @@ export const ViewMode = {
 };
 
 export const EmptyEvent = {
-  type: {
-    type: `taxi`,
-    description: `Taxi to`
-  },
-  city: ``,
-  offers: [],
-  description: [],
-  showplaces: [],
-  startDate: null,
-  endDate: null,
-  duration: null,
-  price: ``,
+  type: `taxi`,
+  destination: ``,
+  offers: [
+    {
+      title: `Choose temperature`,
+      price: 180
+    }, {
+      title: `Upgrade to a business class`,
+      price: 50
+    }
+  ],
+  dateFrom: `2019-07-10T22:55:56.845Z`,
+  dateTo: `2019-07-11T11:22:13.375Z`,
+  basePrice: 222,
   isFavorite: false,
 };
 
@@ -85,26 +87,3 @@ export const EventTypesGroups = {
   transportGroup: `Transfer`,
   activityGroup: `Activity`,
 };
-
-export const Offers = [
-  {
-    type: `luggage`,
-    name: `Add luggage`,
-    price: 10,
-  },
-  {
-    type: `comfort`,
-    name: `Switch to comfort class`,
-    price: 150,
-  },
-  {
-    type: `meal`,
-    name: `Add meal`,
-    price: 2,
-  },
-  {
-    type: `seats`,
-    name: `Choose seats`,
-    price: 9,
-  },
-];

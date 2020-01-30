@@ -4,6 +4,11 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 
+const ButtonsData = {
+  saveButtonText: `Save`,
+  deleteButtonText: `Delete`
+};
+
 const createTypeMarkup = (eventType) => {
   const url = `img/icons/${eventType}.png`;
 
@@ -61,14 +66,13 @@ const createEventDestinationCityMarkup = (destinations) => {
 };
 
 const createEventDestinationMarkup = (eventType, destinations, destination) => {
-  // вынести в отдельную функцию?
   const typesList = Object.values(EventTypes).reduce((a, b) => a.concat(b));
   const typeDescription = typesList.find((it) => it.type === eventType).description;
 
   return (`<label class="event__label  event__type-output" for="event-destination-1">
   ${typeDescription}
   </label>
-  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value='${destination}' list="destination-list-1">
+  <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value='${destination ? destination : ``}' list="destination-list-1" placeholder='${destination ? `` : `choose your destination`}' autocomplete="off">
   <datalist id="destination-list-1">
     ${createEventDestinationCityMarkup(destinations)}
   </datalist>`);
@@ -137,7 +141,9 @@ export const getOffersByType = (offers, eventType) => {
 
 const createAddEventFormTemplate = (event, destinations, allOffers, options = {}) => {
   const {dateFrom, dateTo, basePrice, offers, isFavorite} = event;
-  const {type, description, city, showplaces, mode} = options;
+  const {type, description, city, showplaces, mode, externalData} = options;
+
+  const {saveButtonText, deleteButtonText} = externalData;
 
   const offersByType = getOffersByType(allOffers, type);
 
@@ -171,8 +177,8 @@ const createAddEventFormTemplate = (event, destinations, allOffers, options = {}
         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">${isAdding ? `Cancel` : `Delete`}</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+      <button class="event__reset-btn" type="reset">${isAdding ? `Cancel` : `${deleteButtonText}`}</button>
       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -214,10 +220,12 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._flatpickrStart = null;
     this._flatpickrEnd = null;
 
+    this._externalData = ButtonsData;
+
     this._type = event.type;
-    this._city = event.destination.name;
+    this._city = event.destination.name ? event.destination.name : null;
     this._description = event.destination.description ? event.destination.description : null;
-    this._showplaces = event.destination.pictures.slice();
+    this._showplaces = this._description ? event.destination.pictures.slice() : null;
 
     this._formSubmitHandler = null;
     this._favoriteBtnClickHandler = null;
@@ -292,12 +300,18 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       description: this._description,
       showplaces: this._showplaces,
       mode: this._mode,
+      externalData: this._externalData
     });
   }
 
   getData() {
     const form = this.getElement().querySelector(`.trip-events__item`);
     return new FormData(form);
+  }
+
+  setData(data) {
+    this._externalData = Object.assign({}, ButtonsData, data);
+    this.rerender();
   }
 
   setFormSubmitHandler(handler) {
