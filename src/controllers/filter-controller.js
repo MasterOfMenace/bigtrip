@@ -22,7 +22,6 @@ export default class FilterController {
 
   render() {
     const container = this._container;
-    // const allPoints = this._pointsModel.getPointsAll();
 
     const filters = Object.values(FilterType).map((filter) => {
       return {

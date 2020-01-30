@@ -1,5 +1,5 @@
+import Api from '../src/api/api';
 import {renderElement, RenderPosition} from './utils/render';
-import {generateEvents} from './mocks/event.js';
 import TripInfoComponent from './components/tripinfo.js';
 import MenuComponent, {MenuItem} from './components/menu.js';
 import DayListComponent from './components/daylist.js';
@@ -8,28 +8,28 @@ import PointsModel from './models/points-model';
 import FilterController from './controllers/filter-controller';
 import StatisticsComponent from './components/statistics';
 
-const EVENTS_COUNT = 5;
+const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
+const AUTHORIZATION = `Basic dfo0w590ik298564a`;
 
-const events = generateEvents(EVENTS_COUNT).sort((a, b) => a.startDate - b.startDate);
+const api = new Api(END_POINT, AUTHORIZATION);
+
 const pointsModel = new PointsModel();
-pointsModel.setPoints(events);
 
-const pageMainContainer = document.querySelector(`.page-main`).querySelector(`.page-body__container`);
+const pageMain = document.querySelector(`.page-main`);
 
-const tripInfoContainer = document.querySelector(`.trip-info`);
+const tripInfoContainer = document.querySelector(`.trip-main`);
 
-const tripInfoComponent = new TripInfoComponent(events);
 const menuComponent = new MenuComponent();
 const tripControls = document.querySelector(`.trip-controls`);
+const tripInfoComponent = new TripInfoComponent();
+
 const filterController = new FilterController(tripControls, pointsModel);
 filterController.render();
-
-renderElement(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
 
 renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGIN); // подумать как засунуть под h2
 
 const daysListComponent = new DayListComponent();
-const tripController = new TripController(daysListComponent, pointsModel);
+const tripController = new TripController(daysListComponent, pointsModel, api, tripInfoComponent);
 const dayList = daysListComponent.getElement();
 const statisticsComponent = new StatisticsComponent({events: pointsModel});
 
@@ -39,10 +39,10 @@ document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, ()
 
 const eventsContainer = document.querySelector(`.trip-events`);
 renderElement(eventsContainer, dayList, RenderPosition.BEFOREEND);
-renderElement(pageMainContainer, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
+renderElement(pageMain, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
 
 statisticsComponent.hide();
-tripController.render();
+// tripController.render();
 
 menuComponent.setOnClick((menuItem) => {
   switch (menuItem) {
@@ -60,3 +60,17 @@ menuComponent.setOnClick((menuItem) => {
       break;
   }
 });
+
+api.getPoints()
+  .then((points) => {
+    tripInfoComponent.setEvents(points);
+    renderElement(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
+    pointsModel.setPoints(points);
+  })
+  .then(() => api.getDestinations())
+  .then((destinations) => pointsModel.setDestinations(destinations))
+  .then(() => api.getOffers())
+  .then((offers) => {
+    pointsModel.setOffers(offers);
+    tripController.render();
+  });
