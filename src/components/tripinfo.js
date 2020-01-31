@@ -7,9 +7,8 @@ const getCities = (events) => {
 };
 
 const getDates = (events) => {
-  const dates = events.map((event) => event.dateFrom);
-  const startDate = dates[0];
-  const endDate = dates[dates.length - 1];
+  const startDate = events[0].dateFrom;
+  const endDate = events[events.length - 1].dateTo;
 
   return [
     startDate,
