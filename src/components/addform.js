@@ -272,6 +272,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       altInput: true,
       allowInput: true,
       defaultDate: this._event.dateFrom,
+      enableTime: true,
+      time_24hr: true, // eslint-disable-line
       dateFormat: `Z`,
       altFormat: `d/m/y H:i`,
       onChange(selectedDate) {
@@ -283,6 +285,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       altInput: true,
       allowInput: true,
       defaultDate: this._event.dateTo,
+      enableTime: true,
+      time_24hr: true, // eslint-disable-line
       altFormat: `d/m/y H:i`,
       dateFormat: `Z`,
       minDate: minEndDate,
@@ -344,7 +348,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
 
     this._type = event.type;
     this._city = event.destination.name;
-    this.description = event.destination.description;
+    this._description = event.destination.description;
 
     this.rerender();
   }
