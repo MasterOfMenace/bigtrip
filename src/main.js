@@ -9,7 +9,7 @@ import FilterController from './controllers/filter-controller';
 import StatisticsComponent from './components/statistics';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
-const AUTHORIZATION = `Basic dfo0w590ik298564a`;
+const AUTHORIZATION = `Basic dfo0w590ik298564b`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
 

@@ -52,8 +52,8 @@ const createTimeSpendChart = (ctx, events) => {
       datasets: [{
         data: Object.values(timeData),
         backgroundColor: `#fff`,
-        barThickness: 50,
-        maxBarThickness: 50,
+        barThickness: 25,
+        maxBarThickness: 25,
         minBarLength: 1,
       }]
     },
@@ -77,7 +77,7 @@ const createTimeSpendChart = (ctx, events) => {
           ticks: {
             beginAtZero: true,
             display: true,
-            fontSize: 18,
+            fontSize: 14,
           },
           gridLines: {
             display: false,
@@ -107,7 +107,7 @@ const createTimeSpendChart = (ctx, events) => {
         display: true,
         position: `left`,
         text: `TIME SPENT`,
-        fontSize: 16,
+        fontSize: 24,
         fontColor: `#000000`
       },
       legend: {
@@ -132,8 +132,8 @@ const createTransportChart = (ctx, events) => {
       datasets: [{
         data: transportCount,
         backgroundColor: `#fff`,
-        barThickness: 50,
-        maxBarThickness: 50,
+        barThickness: 25,
+        maxBarThickness: 25,
         minBarLength: 1,
       }]
     },
@@ -157,7 +157,7 @@ const createTransportChart = (ctx, events) => {
           ticks: {
             beginAtZero: true,
             display: true,
-            fontSize: 18,
+            fontSize: 14,
           },
           gridLines: {
             display: false,
@@ -187,7 +187,7 @@ const createTransportChart = (ctx, events) => {
         display: true,
         position: `left`,
         text: `TRANSPORT`,
-        fontSize: 16,
+        fontSize: 24,
         fontColor: `#000000`
       },
       legend: {
@@ -215,8 +215,8 @@ const createMoneyChart = (ctx, events) => {
       datasets: [{
         data: Object.values(moneyData),
         backgroundColor: `#fff`,
-        barThickness: 50,
-        maxBarThickness: 50,
+        barThickness: 25,
+        maxBarThickness: 25,
         minBarLength: 1,
       }]
     },
@@ -240,7 +240,7 @@ const createMoneyChart = (ctx, events) => {
           ticks: {
             beginAtZero: true,
             display: true,
-            fontSize: 18,
+            fontSize: 14,
           },
           gridLines: {
             display: false,
@@ -270,7 +270,7 @@ const createMoneyChart = (ctx, events) => {
         display: true,
         position: `left`,
         text: `MONEY`,
-        fontSize: 16,
+        fontSize: 24,
         fontColor: `#000000`
       },
       legend: {
