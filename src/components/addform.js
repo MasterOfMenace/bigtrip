@@ -1,5 +1,6 @@
 import {EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
+import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
@@ -246,7 +247,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     const cityInput = this.getElement().querySelector(`.event__input--destination`);
     cityInput.addEventListener(`change`, (evt) => {
       if (evt.target.value !== this._city) {
-        this._city = evt.target.value;
+        this._city = he.decode(evt.target.value);
         const destination = this._allDestinations.filter((it) => it.name === evt.target.value).pop();
         this._description = destination.description;
         this._showplaces = destination.pictures.slice();

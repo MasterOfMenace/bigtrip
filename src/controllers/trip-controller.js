@@ -6,6 +6,12 @@ import NoPointsComponent from '../components/no-points';
 import SortComponent from '../components/sort';
 import {getDuration} from '../utils/utils';
 
+// const getSortedDates = (a, b) => {
+//   const first = Date.parse(a);
+//   const second = Date.parse(b);
+//   return first - second;
+// };
+
 const renderEvents = (container, events, onDataChange, onViewChange, destinations, offers) => {
   const controllers = [];
   const dates = new Set();
@@ -14,7 +20,6 @@ const renderEvents = (container, events, onDataChange, onViewChange, destination
     const eventDateFormatted = eventDate.toDateString();
     dates.add(eventDateFormatted);
   });
-
 
   Array.from(dates).forEach((date, index) => {
     const eventsOnDay = events.filter((ev) => {
