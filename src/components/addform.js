@@ -271,27 +271,27 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     let minEndDate = this._event.dateFrom;
 
     this._flatpickrStart = flatpickr(startDateElement, {
-      altInput: true,
-      allowInput: true,
-      defaultDate: this._event.dateFrom,
-      enableTime: true,
-      time_24hr: true, // eslint-disable-line
-      dateFormat: `Z`,
-      altFormat: `d/m/y H:i`,
+      'altInput': true,
+      'allowInput': true,
+      'defaultDate': this._event.dateFrom,
+      'enableTime': true,
+      'time_24hr': true,
+      'dateFormat': `Z`,
+      'altFormat': `d/m/y H:i`,
       onChange(selectedDate) {
         minEndDate = Date.parse(selectedDate);
       }
     });
 
     this._flatpickrEnd = flatpickr(endDateElement, {
-      altInput: true,
-      allowInput: true,
-      defaultDate: this._event.dateTo,
-      enableTime: true,
-      time_24hr: true, // eslint-disable-line
-      altFormat: `d/m/y H:i`,
-      dateFormat: `Z`,
-      minDate: minEndDate,
+      'altInput': true,
+      'allowInput': true,
+      'defaultDate': this._event.dateTo,
+      'enableTime': true,
+      'time_24hr': true,
+      'altFormat': `d/m/y H:i`,
+      'dateFormat': `Z`,
+      'minDate': minEndDate,
       onOpen() {
         this.config.minDate = minEndDate;
       }
