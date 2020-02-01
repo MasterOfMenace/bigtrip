@@ -1,5 +1,5 @@
-import AbstractSmartComponent from './abstract-smart-component';
 import moment from 'moment';
+import AbstractSmartComponent from './abstract-smart-component';
 
 const getCities = (events) => {
   const cities = events.map((event) => event.destination.name);

@@ -1,8 +1,8 @@
-import AbstractSmartComponent from "./abstract-smart-component";
+import AbstractSmartComponent from './abstract-smart-component';
 import Chart from 'chart.js';
 import chartDatalabels from 'chartjs-plugin-datalabels';
 import {EventTypes} from '../constants';
-import {getDuration} from "../utils/utils";
+import {getDuration} from '../utils/utils';
 
 const TRANSPORT_TYPES = EventTypes.transportGroup.map((it) => it.type);
 

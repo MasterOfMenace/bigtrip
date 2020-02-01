@@ -1,5 +1,5 @@
 import {renderElement, RenderPosition} from '../utils/render';
-import DayComponent from "../components/day";
+import DayComponent from '../components/day';
 import PointController from './point-controller';
 import {ViewMode, EmptyEvent, SortType} from '../constants';
 import NoPointsComponent from '../components/no-points';

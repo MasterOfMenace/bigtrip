@@ -1,5 +1,5 @@
-import AbstractComponent from './abstract-component.js';
 import moment from 'moment';
+import AbstractComponent from './abstract-component.js';
 
 const createDayTemplate = (count, date) => {
   if (!count && !date) {

@@ -1,5 +1,5 @@
-import AbstractComponent from "./abstract-component";
-import {SortType} from "../constants";
+import AbstractComponent from './abstract-component';
+import {SortType} from '../constants';
 
 const createSortItem = (sortType, defaultType) => {
   const isChecked = sortType === defaultType;

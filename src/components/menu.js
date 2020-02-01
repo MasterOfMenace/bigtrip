@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 
 export const MenuItem = {
   TABLE: `control__points`,
@@ -22,11 +22,6 @@ export default class MenuComponent extends AbstractComponent {
     return createMenuTemplate();
   }
 
-  _skipActiveItem() {
-    const items = Object.values(MenuItem).map((item) => this.getElement().querySelector(`#${item}`));
-    items.forEach((item) => item.classList.remove(`trip-tabs__btn--active`));
-  }
-
   setActiveItem(menuItem) {
     this._skipActiveItem();
     const item = this.getElement().querySelector(`#${menuItem}`);
@@ -34,6 +29,11 @@ export default class MenuComponent extends AbstractComponent {
     if (item) {
       item.classList.add(`trip-tabs__btn--active`);
     }
+  }
+
+  _skipActiveItem() {
+    const items = Object.values(MenuItem).map((item) => this.getElement().querySelector(`#${item}`));
+    items.forEach((item) => item.classList.remove(`trip-tabs__btn--active`));
   }
 
   setOnClick(handler) {
