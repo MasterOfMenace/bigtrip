@@ -2,6 +2,16 @@ import AbstractComponent from './abstract-component.js';
 import moment from 'moment';
 
 const createDayTemplate = (count, date) => {
+  if (!count && !date) {
+    return (
+      `<li class="trip-days__item  day">
+        <div class="day__info">
+        </div>
+        <ul class="trip-events__list"></ul>
+      </li>`
+    );
+  }
+
   date = moment(new Date(date).toISOString()); // если не перевести дату в ISO, то в консоль падает deprecation warning
   const month = date.format(`MMM`);
   const day = date.format(`D`);
