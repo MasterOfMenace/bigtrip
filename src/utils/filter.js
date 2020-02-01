@@ -1,4 +1,4 @@
-import {FilterType} from "../constants";
+import {FilterType} from '../constants';
 
 const getFutureEvents = (events, date) => {
   return events.filter((event) => {
