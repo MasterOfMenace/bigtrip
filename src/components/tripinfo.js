@@ -1,20 +1,14 @@
-import {MonthNames} from '../constants.js';
+import moment from 'moment';
 import AbstractSmartComponent from './abstract-smart-component';
 
 const getCities = (events) => {
   const cities = events.map((event) => event.destination.name);
-  const startCity = cities[0];
-  const endCity = cities[cities.length - 1];
-  return [
-    startCity,
-    endCity
-  ];
+  return cities;
 };
 
 const getDates = (events) => {
-  const dates = events.map((event) => event.dateFrom);
-  const startDate = dates[0];
-  const endDate = dates[dates.length - 1];
+  const startDate = events[0].dateFrom;
+  const endDate = events[events.length - 1].dateTo;
 
   return [
     startDate,
@@ -22,15 +16,30 @@ const getDates = (events) => {
   ];
 };
 
+const createTripInfoTitle = (cities) => {
+  let [startCity, secondCity, endCity, ...rest] = [];
+  if (cities.length > 3) {
+    [startCity, ...rest] = cities;
+    endCity = rest[rest.length - 1];
+    return `<h1 class="trip-info__title">${startCity} &mdash; ... &mdash; ${endCity}</h1>`;
+  } else if (cities.length === 3) {
+    [startCity, secondCity, endCity] = cities;
+    return `<h1 class="trip-info__title">${startCity} &mdash; ${secondCity} &mdash; ${endCity}</h1>`;
+  } else {
+    [startCity, endCity] = cities;
+    return `<h1 class="trip-info__title">${startCity} &mdash; ${endCity}</h1>`;
+  }
+};
+
 const createTripInfoTemplate = (events) => {
-  let [startCity, endCity] = getCities(events);
+  const tripInfoTitle = createTripInfoTitle(getCities(events));
   let [startDate, endDate] = getDates(events);
-  startDate = new Date(startDate);
-  endDate = new Date(endDate);
-  const startMonth = MonthNames[startDate.getMonth()];
-  const startDay = startDate.getDate();
-  const endMonth = MonthNames[endDate.getMonth()];
-  const endDay = endDate.getDate();
+  startDate = moment(startDate);
+  endDate = moment(endDate);
+  const startMonth = startDate.format(`MMM`);
+  const startDay = startDate.format(`D`);
+  const endMonth = endDate.format(`MMM`);
+  const endDay = endDate.format(`D`);
 
   const eventsCost = events.reduce((acc, current) => {
     return acc + current.basePrice;
@@ -46,7 +55,7 @@ const createTripInfoTemplate = (events) => {
   return (
     `<section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
-      <h1 class="trip-info__title">${startCity} &mdash; ... &mdash; ${endCity}</h1>
+      ${tripInfoTitle}
 
       <p class="trip-info__dates">${startMonth} ${startDay}&nbsp;&mdash;&nbsp;${endMonth} ${endDay}</p>
     </div>

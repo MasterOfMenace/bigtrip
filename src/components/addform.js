@@ -1,8 +1,9 @@
-import {EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
-import AbstractSmartComponent from './abstract-smart-component.js';
+import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
+import {EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 
 const ButtonsData = {
   saveButtonText: `Save`,
@@ -95,14 +96,15 @@ const createEventTimesMarkup = (startTime, endTime) => {
 };
 
 const createOfferMarkup = (offer, checked) => {
-  const isChecked = checked.some((checkedOffer) => checkedOffer === offer.title);
+  const isChecked = checked.some((checkedOffer) => checkedOffer.title === offer.title);
+  const actualOffer = isChecked ? checked.filter((it) => it.title === offer.title).pop() : offer;
   return (
     `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="event-offer" value="${offer.title}" ${isChecked ? `checked` : ``}>
     <label class="event__offer-label" for="event-offer-${offer.title}-1">
       <span class="event__offer-title">${offer.title}</span>
       &plus;
-      &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+      &euro;&nbsp;<span class="event__offer-price">${actualOffer.price}</span>
     </label>
   </div>`
   );
@@ -150,7 +152,7 @@ const createAddEventFormTemplate = (event, destinations, allOffers, options = {}
   const typeMarkup = createEventTypeMarkup(EventTypes, type);
   const destinationMarkup = createEventDestinationMarkup(type, destinations, city);
   const timesMarkup = createEventTimesMarkup(dateFrom, dateTo);
-  const checkedOffers = Array.from(offers).map((offer) => offer.title);
+  const checkedOffers = offers.slice();
 
   const offersMarkup = offersByType.map((offer) => createOfferMarkup(offer, checkedOffers)).join(`\n`);
 
@@ -246,7 +248,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     const cityInput = this.getElement().querySelector(`.event__input--destination`);
     cityInput.addEventListener(`change`, (evt) => {
       if (evt.target.value !== this._city) {
-        this._city = evt.target.value;
+        this._city = he.decode(evt.target.value);
         const destination = this._allDestinations.filter((it) => it.name === evt.target.value).pop();
         this._description = destination.description;
         this._showplaces = destination.pictures.slice();
@@ -272,6 +274,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       altInput: true,
       allowInput: true,
       defaultDate: this._event.dateFrom,
+      enableTime: true,
+      time_24hr: true, // eslint-disable-line
       dateFormat: `Z`,
       altFormat: `d/m/y H:i`,
       onChange(selectedDate) {
@@ -283,6 +287,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       altInput: true,
       allowInput: true,
       defaultDate: this._event.dateTo,
+      enableTime: true,
+      time_24hr: true, // eslint-disable-line
       altFormat: `d/m/y H:i`,
       dateFormat: `Z`,
       minDate: minEndDate,
@@ -344,7 +350,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
 
     this._type = event.type;
     this._city = event.destination.name;
-    this.description = event.destination.description;
+    this._description = event.destination.description;
 
     this.rerender();
   }

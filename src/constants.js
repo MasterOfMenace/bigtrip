@@ -1,5 +1,3 @@
-export const MonthNames = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOW`, `DEC`];
-
 export const FilterType = {
   ALL: `everything`,
   FUTURE: `future`,

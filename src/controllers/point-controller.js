@@ -67,14 +67,15 @@ export default class PointController {
     const formSubmitHandler = (evt) => {
       evt.preventDefault();
 
-      this._editEventComponent.setData({
-        saveButtonText: `Saving...`
-      });
-
       disableForm();
 
       const formData = this._editEventComponent.getData();
       const data = parseFormData(event, this._offers, this._destinations, formData);
+
+      this._editEventComponent.setData({
+        saveButtonText: `Saving...`
+      });
+
       this._onDataChange(this, event, data);
     };
 

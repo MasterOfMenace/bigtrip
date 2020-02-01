@@ -1,5 +1,5 @@
-import {formatTime, getDuration} from '../utils/utils';
 import AbstractComponent from './abstract-component.js';
+import {formatTime, getDuration} from '../utils/utils';
 import {EventTypes} from '../constants';
 
 const createEventTypeMarkup = (eventType, destination) => {

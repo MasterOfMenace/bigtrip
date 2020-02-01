@@ -1,5 +1,5 @@
-import {FilterType} from "../constants";
-import {getEventsByFilter} from "../utils/filter";
+import {FilterType} from '../constants';
+import {getEventsByFilter} from '../utils/filter';
 
 export default class PointsModel {
   constructor() {

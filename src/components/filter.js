@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component";
+import AbstractComponent from './abstract-component';
 
 const FILTER_ID_PREFIX = `filter-`;
 
@@ -9,8 +9,6 @@ const getFilterNameById = (id) => {
 const createFilterMarkup = (filter, isChecked) => {
   const {name} = filter;
 
-  // const isChecked = (name === `everything`) ? `checked` : ``;
-
   return (
     `<div class="trip-filters__filter">
       <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name}" ${isChecked ? `checked` : ``}>
@@ -20,7 +18,6 @@ const createFilterMarkup = (filter, isChecked) => {
 };
 
 const createFiltersTemplate = (filters) => {
-  // console.log(filters);
   const filtersMarkup = filters.map((it) => createFilterMarkup(it, it.checked)).join(`\n`);
 
   return (

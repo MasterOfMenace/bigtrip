@@ -1,10 +1,20 @@
-import {MonthNames} from '../constants.js';
+import moment from 'moment';
 import AbstractComponent from './abstract-component.js';
 
 const createDayTemplate = (count, date) => {
-  date = new Date(date);
-  const month = MonthNames[date.getMonth()];
-  const day = date.getDate();
+  if (!count && !date) {
+    return (
+      `<li class="trip-days__item  day">
+        <div class="day__info">
+        </div>
+        <ul class="trip-events__list"></ul>
+      </li>`
+    );
+  }
+
+  date = moment(new Date(date).toISOString()); // если не перевести дату в ISO, то в консоль падает deprecation warning
+  const month = date.format(`MMM`);
+  const day = date.format(`D`);
   return (
     `<li class="trip-days__item  day">
       <div class="day__info">
