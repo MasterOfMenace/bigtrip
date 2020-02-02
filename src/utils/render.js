@@ -11,7 +11,8 @@ export const createElement = (template) => {
   return element.firstChild;
 };
 
-export const renderElement = (container, element, place) => {
+export const renderElement = (container, component, place) => {
+  const element = component.getElement();
   switch (place) {
     case RenderPosition.AFTERBEGIN:
       container.prepend(element);
@@ -36,4 +37,9 @@ export const replace = (newComponent, oldComponent) => {
   if (isExistElements && parentElement.contains(oldElement)) {
     parentElement.replaceChild(newElement, oldElement);
   }
+};
+
+export const remove = (component) => {
+  component.getElement().remove();
+  component.removeElement();
 };

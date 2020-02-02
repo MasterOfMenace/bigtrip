@@ -1,5 +1,5 @@
 import {FilterType} from "../constants";
-import FilterComponent from '../components/filter';
+import FilterComponent from '../components/filter-component';
 import {replace, renderElement, RenderPosition} from "../utils/render";
 
 export default class FilterController {
@@ -38,7 +38,7 @@ export default class FilterController {
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
     } else {
-      renderElement(container, this._filterComponent.getElement(), RenderPosition.BEFOREEND);
+      renderElement(container, this._filterComponent, RenderPosition.BEFOREEND);
     }
   }
 

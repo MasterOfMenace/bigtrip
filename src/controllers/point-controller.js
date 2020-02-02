@@ -1,6 +1,6 @@
-import EventComponent from '../components/event-template';
-import EventEditFormComponent, {getOffersByType} from '../components/addform';
-import {renderElement, RenderPosition, replace} from '../utils/render';
+import EventComponent from '../components/event-component';
+import EventEditFormComponent, {getOffersByType} from '../components/event-edit-form-component';
+import {renderElement, RenderPosition, replace, remove} from '../utils/render';
 import {ViewMode, EmptyEvent} from '../constants';
 import PointModel from '../models/point-model';
 
@@ -11,7 +11,7 @@ const parseFormData = (event, offers, destinations, formData) => {
   const end = formData.get(`event-end-time`);
   const city = formData.get(`event-destination`);
   const type = formData.get(`event-type`);
-  const destination = destinations.filter((it) => it.name === city).pop();
+  const destination = destinations.find((it) => it.name === city);
   const offersFromForm = formData.getAll(`event-offer`);
   const currentOffersByType = getOffersByType(offers, type);
   const checkedOffers = currentOffersByType.filter((offer) => offersFromForm.includes(offer.title));
@@ -96,18 +96,16 @@ export default class PointController {
           replace(this._editEventComponent, oldEditEventComponent);
           this._replaceEditToEvent();
         } else {
-          renderElement(this._container, this._eventComponent.getElement(), RenderPosition.BEFOREEND);
+          renderElement(this._container, this._eventComponent, RenderPosition.BEFOREEND);
         }
         break;
       case ViewMode.ADD:
         if (oldEditEventComponent && oldEventComponent) {
-          oldEventComponent.getElement().remove();
-          oldEventComponent.removeElement();
-          oldEditEventComponent.getElement().remove();
-          oldEditEventComponent.removeElement();
+          remove(oldEventComponent);
+          remove(oldEditEventComponent);
         }
         document.addEventListener(`keydown`, this._onEscKeyDown);
-        renderElement(this._container, this._editEventComponent.getElement(), RenderPosition.AFTERBEGIN);
+        renderElement(this._container, this._editEventComponent, RenderPosition.AFTERBEGIN);
         break;
     }
   }
@@ -130,10 +128,8 @@ export default class PointController {
   }
 
   destroy() {
-    this._eventComponent.getElement().remove();
-    this._eventComponent.removeElement();
-    this._editEventComponent.getElement().remove();
-    this._editEventComponent.removeElement();
+    remove(this._eventComponent);
+    remove(this._editEventComponent);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
@@ -144,14 +140,16 @@ export default class PointController {
   }
 
   shake() {
-    this._editEventComponent.getElement().querySelector(`.trip-events__item`).style = `border: 1px solid red`;
+    const eventEditElement = this._editEventComponent.getElement();
+    const eventElement = this._eventComponent.getElement();
+    eventEditElement.querySelector(`.trip-events__item`).style = `border: 1px solid red`;
 
-    this._editEventComponent.getElement().style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
-    this._eventComponent.getElement().style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
+    eventEditElement.style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
+    eventElement.style.animation = `shake ${SHAKE_TIMEOUT / 1000}s`;
 
     setTimeout(() => {
-      this._editEventComponent.getElement().style.animation = ``;
-      this._eventComponent.getElement().style.animation = ``;
+      eventEditElement.style.animation = ``;
+      eventElement.style.animation = ``;
 
       this._editEventComponent.setData({
         saveButtonText: `Save`,

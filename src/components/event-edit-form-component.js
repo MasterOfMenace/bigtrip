@@ -97,7 +97,7 @@ const createEventTimesMarkup = (startTime, endTime) => {
 
 const createOfferMarkup = (offer, checked) => {
   const isChecked = checked.some((checkedOffer) => checkedOffer.title === offer.title);
-  const actualOffer = isChecked ? checked.filter((it) => it.title === offer.title).pop() : offer;
+  const actualOffer = isChecked ? checked.find((it) => it.title === offer.title) : offer;
   return (
     `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="event-offer" value="${offer.title}" ${isChecked ? `checked` : ``}>
@@ -137,7 +137,7 @@ const createDescriptionMarkup = (description, showplaces) => {
 };
 
 export const getOffersByType = (offers, eventType) => {
-  const offerModel = offers.filter((it) => it.type === eventType).pop();
+  const offerModel = offers.find((it) => it.type === eventType);
   return offerModel.offers;
 };
 
@@ -259,7 +259,7 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
         this.rerender();
       } else if (evt.target.value !== this._city) {
         this._city = he.decode(evt.target.value);
-        const destination = this._allDestinations.filter((it) => it.name === evt.target.value).pop();
+        const destination = this._allDestinations.find((it) => it.name === evt.target.value);
         this._description = destination.description;
         this._showplaces = destination.pictures.slice();
         this.rerender();

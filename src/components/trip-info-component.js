@@ -26,17 +26,19 @@ const getDates = (events) => {
 
 const createTripInfoTitle = (cities) => {
   let [startCity, secondCity, endCity, ...rest] = [];
+  let citiesMarkup = ``;
   if (cities.length > 3) {
     [startCity, ...rest] = cities;
     endCity = rest[rest.length - 1];
-    return `<h1 class="trip-info__title">${startCity} &mdash; ... &mdash; ${endCity}</h1>`;
+    citiesMarkup = `${startCity} &mdash; ... &mdash; ${endCity}`;
   } else if (cities.length === 3) {
     [startCity, secondCity, endCity] = cities;
-    return `<h1 class="trip-info__title">${startCity} &mdash; ${secondCity} &mdash; ${endCity}</h1>`;
+    citiesMarkup = `${startCity} &mdash; ${secondCity} &mdash; ${endCity}`;
   } else {
     [startCity, endCity] = cities;
-    return `<h1 class="trip-info__title">${startCity} &mdash; ${endCity}</h1>`;
+    citiesMarkup = `${startCity} &mdash; ${endCity}`;
   }
+  return `<h1 class="trip-info__title">${citiesMarkup}</h1>`;
 };
 
 const createTripInfoTemplate = (events) => {

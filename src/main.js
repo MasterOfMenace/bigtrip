@@ -1,12 +1,12 @@
 import Api from '../src/api/api';
 import {renderElement, RenderPosition} from './utils/render';
-import TripInfoComponent from './components/tripinfo.js';
-import MenuComponent, {MenuItem} from './components/menu.js';
-import DayListComponent from './components/daylist.js';
+import TripInfoComponent from './components/trip-info-component.js';
+import MenuComponent, {MenuItem} from './components/menu-component.js';
+import DayListComponent from './components/day-list-component.js';
 import TripController from './controllers/trip-controller';
 import PointsModel from './models/points-model';
 import FilterController from './controllers/filter-controller';
-import StatisticsComponent from './components/statistics';
+import StatisticsComponent from './components/statistics-component';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const AUTHORIZATION = `Basic dfo0w590ik298564b`;
@@ -26,11 +26,10 @@ const tripInfoComponent = new TripInfoComponent();
 const filterController = new FilterController(tripControls, pointsModel);
 filterController.render();
 
-renderElement(tripControls, menuComponent.getElement(), RenderPosition.AFTERBEGIN); // подумать как засунуть под h2
+renderElement(tripControls, menuComponent, RenderPosition.AFTERBEGIN);
 
 const daysListComponent = new DayListComponent();
 const tripController = new TripController(daysListComponent, pointsModel, api, tripInfoComponent);
-const dayList = daysListComponent.getElement();
 const statisticsComponent = new StatisticsComponent({events: pointsModel});
 
 document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, () => {
@@ -38,8 +37,8 @@ document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, ()
 });
 
 const eventsContainer = document.querySelector(`.trip-events`);
-renderElement(eventsContainer, dayList, RenderPosition.BEFOREEND);
-renderElement(pageMain, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
+renderElement(eventsContainer, daysListComponent, RenderPosition.BEFOREEND);
+renderElement(pageMain, statisticsComponent, RenderPosition.BEFOREEND);
 
 statisticsComponent.hide();
 
@@ -63,7 +62,7 @@ menuComponent.setOnClick((menuItem) => {
 api.getPoints()
   .then((points) => {
     tripInfoComponent.setEvents(points);
-    renderElement(tripInfoContainer, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
+    renderElement(tripInfoContainer, tripInfoComponent, RenderPosition.AFTERBEGIN);
     pointsModel.setPoints(points);
   })
   .then(() => api.getDestinations())

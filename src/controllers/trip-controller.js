@@ -1,9 +1,9 @@
 import {renderElement, RenderPosition} from '../utils/render';
-import DayComponent from '../components/day';
+import DayComponent from '../components/day-component';
 import PointController from './point-controller';
 import {ViewMode, EmptyEvent, SortType} from '../constants';
-import NoPointsComponent from '../components/no-points';
-import SortComponent from '../components/sort';
+import NoPointsComponent from '../components/no-points-component';
+import SortComponent from '../components/sort-component';
 import {getDuration} from '../utils/utils';
 
 const getSortedDates = (a, b) => {
@@ -34,8 +34,8 @@ const renderEvents = (container, events, onDataChange, onViewChange, destination
       return eventDateFormatted === date;
     });
 
-    const day = new DayComponent(index + 1, date).getElement();
-    const eventsList = day.querySelector(`.trip-events__list`);
+    const day = new DayComponent(index + 1, date);
+    const eventsList = day.getElement().querySelector(`.trip-events__list`);
     controllers.push(eventsOnDay.map((event) => renderEvent(eventsList, event, onDataChange, onViewChange, destinations, offers)));
     renderElement(container, day, RenderPosition.BEFOREEND);
   });
@@ -44,8 +44,8 @@ const renderEvents = (container, events, onDataChange, onViewChange, destination
 
 const renderSortEvents = (container, events, onDataChange, onViewChange, destinations, offers) => {
   const controllers = [];
-  const day = new DayComponent().getElement();
-  const eventsList = day.querySelector(`.trip-events__list`);
+  const day = new DayComponent();
+  const eventsList = day.getElement().querySelector(`.trip-events__list`);
   controllers.push(events.map((event) => renderEvent(eventsList, event, onDataChange, onViewChange, destinations, offers)));
   renderElement(container, day, RenderPosition.BEFOREEND);
   return controllers.reduce((a, b) => a.concat(b), []);
@@ -90,11 +90,11 @@ export default class TripController {
     const isNoPointsExist = events.length === 0;
 
     if (events.length > 0 || this._creatingPoint) {
-      renderElement(container, this._sortComponent.getElement(), RenderPosition.BEFOREBEGIN);
+      renderElement(container, this._sortComponent, RenderPosition.BEFOREBEGIN);
     }
 
     if (isNoPointsExist) {
-      renderElement(container, this._noPointsComponent.getElement(), RenderPosition.BEFOREEND);
+      renderElement(container, this._noPointsComponent, RenderPosition.BEFOREEND);
       return;
     }
 
@@ -142,13 +142,20 @@ export default class TripController {
         break;
     }
 
+    this._removePoints();
+
     if (this._sortType === SortType.EVENT) {
-      this._removePoints();
       this._pointControllers = renderEvents(container, sortedPoints, this._onDataChange, this._onViewChange, this._pointsModel.getDestinations(), this._pointsModel.getOffers());
     } else {
-      this._removePoints();
       this._pointControllers = renderSortEvents(container, sortedPoints, this._onDataChange, this._onViewChange, this._pointsModel.getDestinations(), this._pointsModel.getOffers());
     }
+  }
+
+  _rerender() {
+    this._removePoints();
+    this.render();
+    this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
+    this._tripInfoComponent.rerender();
   }
 
   _onDataChange(pointController, oldData, newData) {
@@ -162,10 +169,7 @@ export default class TripController {
         this._api.createPoint(newData)
           .then((pointModel) => {
             this._pointsModel.addPoint(pointModel);
-            this._removePoints();
-            this.render();
-            this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
-            this._tripInfoComponent.rerender();
+            this._rerender();
           })
           .catch(() => {
             pointController.shake();
@@ -175,10 +179,7 @@ export default class TripController {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
-          this._removePoints();
-          this.render();
-          this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
-          this._tripInfoComponent.rerender();
+          this._rerender();
         })
         .catch(() => pointController.shake());
     } else {
@@ -188,10 +189,7 @@ export default class TripController {
 
           if (isSuccess) {
             pointController.render(newData, ViewMode.DEFAULT);
-            this._removePoints();
-            this.render();
-            this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
-            this._tripInfoComponent.rerender();
+            this._rerender();
           }
         })
         .catch(() => pointController.shake());
