@@ -1,6 +1,6 @@
 import AbstractSmartComponent from './abstract-smart-component';
 import Chart from 'chart.js';
-import chartDatalabels from 'chartjs-plugin-datalabels';
+import chartDataLabels from 'chartjs-plugin-datalabels';
 import {EventTypes} from '../constants';
 import {getDuration} from '../utils/utils';
 
@@ -45,7 +45,7 @@ const createTimeSpendChart = (ctx, events) => {
   });
 
   return new Chart(ctx, {
-    plugins: [chartDatalabels],
+    plugins: [chartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: Object.keys(timeData).map((it) => it.toUpperCase()),
@@ -122,15 +122,15 @@ const createTransportChart = (ctx, events) => {
 
   const uniqueTransportTypes = currentEventTypes.filter((it) => TRANSPORT_TYPES.includes(it)).filter(getUniqItems);
 
-  const transportCount = uniqueTransportTypes.map((type) => calculateUniqueTransportCount(currentEventTypes, type));
+  const transportsCount = uniqueTransportTypes.map((type) => calculateUniqueTransportCount(currentEventTypes, type));
 
   return new Chart(ctx, {
-    plugins: [chartDatalabels],
+    plugins: [chartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: uniqueTransportTypes.map((it) => it.toUpperCase()),
       datasets: [{
-        data: transportCount,
+        data: transportsCount,
         backgroundColor: `#fff`,
         barThickness: 25,
         maxBarThickness: 25,
@@ -208,7 +208,7 @@ const createMoneyChart = (ctx, events) => {
   });
 
   return new Chart(ctx, {
-    plugins: [chartDatalabels],
+    plugins: [chartDataLabels],
     type: `horizontalBar`,
     data: {
       labels: Object.keys(moneyData).map((it) => it.toUpperCase()),

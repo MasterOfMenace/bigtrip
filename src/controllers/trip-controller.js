@@ -154,7 +154,7 @@ export default class TripController {
   _onDataChange(pointController, oldData, newData) {
     if (oldData === EmptyEvent) {
       this._creatingPoint = null;
-      if (newData === null) {
+      if (!newData) {
         pointController.destroy();
         this._removePoints();
         this._renderPoints();
@@ -167,9 +167,11 @@ export default class TripController {
             this._tripInfoComponent.resetEvents(this._pointsModel.getPoints());
             this._tripInfoComponent.rerender();
           })
-          .catch(() => pointController.shake());
+          .catch(() => {
+            pointController.shake();
+          });
       }
-    } else if (newData === null) {
+    } else if (!newData) {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);

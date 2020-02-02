@@ -42,7 +42,6 @@ renderElement(eventsContainer, dayList, RenderPosition.BEFOREEND);
 renderElement(pageMain, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
 
 statisticsComponent.hide();
-// tripController.render();
 
 menuComponent.setOnClick((menuItem) => {
   switch (menuItem) {

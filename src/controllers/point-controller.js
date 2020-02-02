@@ -51,15 +51,6 @@ export default class PointController {
     this._eventComponent = new EventComponent(event);
     this._editEventComponent = new EventEditFormComponent(event, viewMode, this._destinations, this._offers);
 
-    const disableForm = () => {
-      const form = this._editEventComponent.getElement().querySelector(`.trip-events__item`);
-      form.classList.add(`event--blocked`);
-      const submitButton = this._editEventComponent.getElement().querySelector(`.event__save-btn`);
-      const deleteButton = this._editEventComponent.getElement().querySelector(`.event__reset-btn`);
-      submitButton.setAttribute(`disabled`, `true`);
-      deleteButton.setAttribute(`disabled`, `true`);
-    };
-
     const rollupBtnHandler = () => {
       this._replaceEventToEdit();
       document.addEventListener(`keydown`, this._onEscKeyDown);
@@ -67,14 +58,14 @@ export default class PointController {
     const formSubmitHandler = (evt) => {
       evt.preventDefault();
 
-      disableForm();
-
       const formData = this._editEventComponent.getData();
       const data = parseFormData(event, this._offers, this._destinations, formData);
 
       this._editEventComponent.setData({
         saveButtonText: `Saving...`
       });
+
+      this._editEventComponent.disableForm();
 
       this._onDataChange(this, event, data);
     };
@@ -84,7 +75,7 @@ export default class PointController {
         deleteButtonText: `Deleting...`
       });
 
-      disableForm();
+      this._editEventComponent.disableForm();
 
       this._onDataChange(this, event, null);
     });
@@ -138,17 +129,6 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  _onEscKeyDown(evt) {
-    const isEscPress = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscPress) {
-      if (this._viewMode === ViewMode.ADD) {
-        this._onDataChange(this, EmptyEvent, null);
-      }
-      this._replaceEditToEvent();
-    }
-  }
-
   destroy() {
     this._eventComponent.getElement().remove();
     this._eventComponent.removeElement();
@@ -177,6 +157,18 @@ export default class PointController {
         saveButtonText: `Save`,
         deleteButtonText: `Delete`
       });
+      this._editEventComponent.enableForm();
     }, SHAKE_TIMEOUT);
+  }
+
+  _onEscKeyDown(evt) {
+    const isEscPress = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscPress) {
+      if (this._viewMode === ViewMode.ADD) {
+        this._onDataChange(this, EmptyEvent, null);
+      }
+      this._replaceEditToEvent();
+    }
   }
 }

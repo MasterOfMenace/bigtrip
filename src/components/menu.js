@@ -32,8 +32,10 @@ export default class MenuComponent extends AbstractComponent {
   }
 
   _skipActiveItem() {
-    const items = Object.values(MenuItem).map((item) => this.getElement().querySelector(`#${item}`));
-    items.forEach((item) => item.classList.remove(`trip-tabs__btn--active`));
+    const activeItem = Object.values(MenuItem)
+      .map((item) => this.getElement().querySelector(`#${item}`))
+        .find((item) => item.classList.contains(`trip-tabs__btn--active`));
+    activeItem.classList.remove(`trip-tabs__btn--active`);
   }
 
   setOnClick(handler) {

@@ -15,10 +15,6 @@ export default class PointsModel {
     return getEventsByFilter(this._points, this._activeFilter);
   }
 
-  getPointsAll() {
-    return this._points;
-  }
-
   getDestinations() {
     return this._destinations;
   }

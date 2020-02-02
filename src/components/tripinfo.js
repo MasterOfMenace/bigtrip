@@ -1,14 +1,22 @@
 import moment from 'moment';
 import AbstractSmartComponent from './abstract-smart-component';
 
+const getSortedEvents = (events) => {
+  return events.sort((a, b) => {
+    return Date.parse(a.dateFrom) - Date.parse(b.dateFrom);
+  });
+};
+
 const getCities = (events) => {
-  const cities = events.map((event) => event.destination.name);
+  const sortedEvents = getSortedEvents(events);
+  const cities = sortedEvents.map((event) => event.destination.name);
   return cities;
 };
 
 const getDates = (events) => {
-  const startDate = events[0].dateFrom;
-  const endDate = events[events.length - 1].dateTo;
+  const sortedEvents = getSortedEvents(events);
+  const startDate = sortedEvents[0].dateFrom;
+  const endDate = sortedEvents[events.length - 1].dateTo;
 
   return [
     startDate,

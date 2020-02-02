@@ -5,7 +5,7 @@ import 'flatpickr/dist/themes/light.css';
 import {EventTypes, EventTypesGroups, ViewMode} from '../constants.js';
 import AbstractSmartComponent from './abstract-smart-component.js';
 
-const ButtonsData = {
+const ButtonData = {
   saveButtonText: `Save`,
   deleteButtonText: `Delete`
 };
@@ -143,7 +143,7 @@ export const getOffersByType = (offers, eventType) => {
 
 const createAddEventFormTemplate = (event, destinations, allOffers, options = {}) => {
   const {dateFrom, dateTo, basePrice, offers, isFavorite} = event;
-  const {type, description, city, showplaces, mode, externalData} = options;
+  const {type, description, city, showplaces, mode, externalData, isDisable} = options;
 
   const {saveButtonText, deleteButtonText} = externalData;
 
@@ -158,9 +158,13 @@ const createAddEventFormTemplate = (event, destinations, allOffers, options = {}
 
   const descriptionMarkup = createDescriptionMarkup(description, showplaces);
   const isAdding = mode === ViewMode.ADD;
+
+  const formDisableClass = isDisable ? `event--blocked` : ``;
+  const buttonDisableAttribute = isDisable ? `disabled` : ``;
+
   return (
     `<div>
-    <form class="trip-events__item  event  event--edit" action="#" method="post">
+    <form class="trip-events__item  event  event--edit ${formDisableClass}" action="#" method="post">
     <header class="event__header">
       ${typeMarkup}
       <div class="event__field-group  event__field-group--destination">
@@ -179,8 +183,8 @@ const createAddEventFormTemplate = (event, destinations, allOffers, options = {}
         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
-      <button class="event__reset-btn" type="reset">${isAdding ? `Cancel` : `${deleteButtonText}`}</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${buttonDisableAttribute}>${saveButtonText}</button>
+      <button class="event__reset-btn" type="reset" ${buttonDisableAttribute}>${isAdding ? `Cancel` : `${deleteButtonText}`}</button>
       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
       <span class="visually-hidden">Add to favorite</span>
@@ -196,7 +200,7 @@ const createAddEventFormTemplate = (event, destinations, allOffers, options = {}
 
     <section class="event__details">
 
-      <section class="event__section  event__section--offers">
+      <section class="event__section  event__section--offers ${offersByType.length === 0 ? `visually-hidden` : ``}">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
@@ -222,7 +226,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
     this._flatpickrStart = null;
     this._flatpickrEnd = null;
 
-    this._externalData = ButtonsData;
+    this._externalData = ButtonData;
+    this._isDisable = false;
 
     this._type = event.type;
     this._city = event.destination.name ? event.destination.name : null;
@@ -247,7 +252,12 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
   _setCityInputChangeHandler() {
     const cityInput = this.getElement().querySelector(`.event__input--destination`);
     cityInput.addEventListener(`change`, (evt) => {
-      if (evt.target.value !== this._city) {
+      if (!evt.target.value) {
+        this._city = null;
+        this._description = null;
+        this._showplaces = null;
+        this.rerender();
+      } else if (evt.target.value !== this._city) {
         this._city = he.decode(evt.target.value);
         const destination = this._allDestinations.filter((it) => it.name === evt.target.value).pop();
         this._description = destination.description;
@@ -306,7 +316,8 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
       description: this._description,
       showplaces: this._showplaces,
       mode: this._mode,
-      externalData: this._externalData
+      externalData: this._externalData,
+      isDisable: this._isDisable
     });
   }
 
@@ -316,7 +327,17 @@ export default class EventEditFormComponent extends AbstractSmartComponent {
   }
 
   setData(data) {
-    this._externalData = Object.assign({}, ButtonsData, data);
+    this._externalData = Object.assign({}, ButtonData, data);
+    this.rerender();
+  }
+
+  disableForm() {
+    this._isDisable = true;
+    this.rerender();
+  }
+
+  enableForm() {
+    this._isDisable = false;
     this.rerender();
   }
 
