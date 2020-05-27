@@ -5,6 +5,7 @@
   "description": "Личный проект «Большое путешествие» от HTML Academy",
   "scripts": {
     "build": "webpack",
+    "deploy": "gh-pages -d public",
     "start": "webpack-dev-server --open",
     "eslint": "eslint src/**/*.js",
     "test": "npm run eslint"
